@@ -1,0 +1,69 @@
+<configuration>
+    <property name="LOGS_DIR" value="logs" />
+
+	<!-- 📌 Appender para la consola (solo logs generales) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- 📁 Appender para logs generales -->
+    <appender name="GENERAL_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_DIR}/general.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS_DIR}/general-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    
+
+    <!-- 📁 Appender para logs de tareas programadas -->
+    <appender name="SCHEDULED_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_DIR}/scheduled.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS_DIR}/scheduled-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+    
+    <!-- 📁 Appender para logs de tareas programadas -->
+    <appender name="TASKS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_DIR}/tasks.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS_DIR}/tasks-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 📌 Logger para logs generales -->
+    <logger name="dev.pablito.dots" level="INFO" additivity="false">
+        <appender-ref ref="GENERAL_LOG"/>
+    </logger>
+
+    <!-- 🔥 Logger específico para tareas programadas -->
+    <logger name="dev.pablito.dots.scheduler" level="INFO" additivity="false">
+        <appender-ref ref="SCHEDULED_LOG"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    
+    <logger name="dev.pablito.dots.controller" level="INFO" additivity="false">
+        <appender-ref ref="TASKS_LOG"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- 🌍 Logger raíz -->
+    <root level="INFO">
+        <appender-ref ref="GENERAL_LOG"/>
+    </root>
+</configuration>
