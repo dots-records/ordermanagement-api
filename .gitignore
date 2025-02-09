@@ -37,3 +37,4 @@ build/
 *.log
 src/main/resources/application.properties
 src/main/resources/env
+src/main/resources/.env
