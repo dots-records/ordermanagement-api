@@ -58,6 +58,7 @@ public class ReleaseController {
 			long duration = Duration.between(start, end).toSeconds();
 			logger.info("[TASK END] getReleases({}, {}) - {} s ", page, size, duration);
 			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
+			
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] getReleases({}, {})", page, size, e);
 			return ResponseEntity.noContent().build();
