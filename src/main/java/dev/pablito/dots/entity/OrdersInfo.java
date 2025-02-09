@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Document(collection = "ordersInformation")
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class OrdersInfo {
 	@Id
 	private String id;
