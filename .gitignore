@@ -35,4 +35,4 @@ build/
 
 ### files ###
 *.log
-aplication.properties
+/src/main/resources/aplication.properties
