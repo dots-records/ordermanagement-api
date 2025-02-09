@@ -1,5 +1,7 @@
 package dev.pablito.dots;
 
+package dev.pablito.dots;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +23,6 @@ public class DotsApplication {
 
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(DotsApplication.class, args);
-        
 	}
-	
+
 }
