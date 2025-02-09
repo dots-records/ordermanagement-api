@@ -380,3 +380,19 @@ Caused by: com.mongodb.MongoWriteException: Write operation error on server ac-f
 2025-02-09 18:10:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED END] checkOrdersInDiscogs() - 0 s 
 2025-02-09 18:11:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED START] checkOrdersInDiscogs()
 2025-02-09 18:11:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED END] checkOrdersInDiscogs() - 0 s 
+2025-02-09 18:12:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED START] checkOrdersInDiscogs()
+2025-02-09 18:12:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED END] checkOrdersInDiscogs() - 0 s 
+2025-02-09 18:13:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED START] checkOrdersInDiscogs()
+2025-02-09 18:13:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED END] checkOrdersInDiscogs() - 0 s 
+2025-02-09 18:14:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED START] checkOrdersInDiscogs()
+2025-02-09 18:14:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED END] checkOrdersInDiscogs() - 0 s 
+2025-02-09 18:15:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED START] checkOrdersInDiscogs()
+2025-02-09 18:15:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED END] checkOrdersInDiscogs() - 0 s 
+2025-02-09 18:16:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED START] checkOrdersInDiscogs()
+2025-02-09 18:16:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED END] checkOrdersInDiscogs() - 0 s 
+2025-02-09 18:17:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED START] checkOrdersInDiscogs()
+2025-02-09 18:17:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED END] checkOrdersInDiscogs() - 0 s 
+2025-02-09 18:18:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED START] checkOrdersInDiscogs()
+2025-02-09 18:18:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED END] checkOrdersInDiscogs() - 0 s 
+2025-02-09 18:19:21 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED START] checkOrdersInDiscogs()
+2025-02-09 18:19:22 [scheduling-1] INFO  d.p.dots.scheduler.OrderScheduler - [SCHEDULED END] checkOrdersInDiscogs() - 1 s 
