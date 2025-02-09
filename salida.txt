@@ -1,8 +1,0 @@
-HELP.md
-logs/
-mvnw*
-mvnw.cmd
-pom.xml
-salida.txt
-src/
-target/
