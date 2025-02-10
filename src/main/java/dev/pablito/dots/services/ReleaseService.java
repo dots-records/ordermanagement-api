@@ -34,7 +34,7 @@ public class ReleaseService {
 		return releasePage;
 	}
 
-	public Page<DatabaseOrder> searchReleases(String palabra, int page, int size) {
+	public Page<DatabaseRelease> searchReleases(String palabra, int page, int size) {
 		PageRequest pageable = PageRequest.of(page, size);
 		return releaseRepository.findBySearchTerm(palabra, pageable);
 	}
