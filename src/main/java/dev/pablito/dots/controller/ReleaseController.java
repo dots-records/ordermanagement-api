@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.pablito.dots.entity.DatabaseRelease;
+import dev.pablito.dots.entity.SearchRequest;
 import dev.pablito.dots.services.ReleaseService;
 
 @RestController
@@ -34,7 +36,6 @@ public class ReleaseController {
 	@PostMapping("/putReleaseFromDiscogs/{id}")
 	public void putReleaseFromDiscogs(@PathVariable Long id) throws IOException, InterruptedException {
 		Instant start = Instant.now();
-		// gola
 		logger.info("[TASK START] putReleaseFromDiscogs({})", id);
 		try {
 			releaseService.putReleaseFromDiscogs(id);
@@ -60,6 +61,24 @@ public class ReleaseController {
 			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] getReleases({}, {})", page, size, e);
+			return ResponseEntity.noContent().build();
+		}
+	}
+
+	// Search releases which in database "Releases"
+	@PostMapping("/searchReleases/page={page}&size={size}")
+	public ResponseEntity<Page<DatabaseRelease>> searchUnarchivedOrders(@RequestBody SearchRequest request,
+			@PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
+		Instant start = Instant.now();
+		logger.info("[TASK START] searchReleases({}, {}, {})", request.getSearch(), size, page);
+		try {
+			Page<DatabaseRelease> response = releaseService.searchReleases(request.getSearch(), page, size);
+			Instant end = Instant.now();
+			long duration = Duration.between(start, end).toSeconds();
+			logger.info("[TASK END] searchReleases({}, {}, {}) - {} s ", request.getSearch(), size, page, duration);
+			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] searchReleases({}, {}, {})", request.getSearch(), size, page, e);
 			return ResponseEntity.noContent().build();
 		}
 	}
