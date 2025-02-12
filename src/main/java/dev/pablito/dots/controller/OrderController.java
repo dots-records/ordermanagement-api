@@ -164,12 +164,14 @@ public class OrderController {
 		return new ResponseEntity<Page<DatabaseOrder>>(orderService.searchOrdersByArchived(request.getSearch(), page, size, false), HttpStatus.OK);
 	}
 	
+	// Search orders which archived = true in database "Orders"
 	@PostMapping("/searchArchivedOrders/page={page}&size={size}")
 	public ResponseEntity<Page<DatabaseOrder>>searchArchivedOrders(@RequestBody SearchRequest request, @PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
 		System.out.println(request.getSearch());
 		return new ResponseEntity<Page<DatabaseOrder>>(orderService.searchOrdersByArchived(request.getSearch(), page, size, true), HttpStatus.OK);
 	}
 	
+	// Search orders in database "Orders"
 	@PostMapping("/searchAllOrders/page={page}&size={size}")
 	public ResponseEntity<Page<DatabaseOrder>>searchAllOrders(@RequestBody SearchRequest request, @PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
 		System.out.println(request.getSearch());
