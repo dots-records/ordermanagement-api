@@ -27,6 +27,7 @@ public class OrderScheduler {
 	// TODO: Hacer q cuando falle tambien guarde el ordersInformation
 	//Every 60 seconds updates the database "Orders" checking if a new Order has been made in Discogs
 	//@Scheduled(fixedRate = 60000)
+	
 	public void checkOrdersInDiscogs() {
 		Instant start = Instant.now();
         logger.info("[SCHEDULED START] checkOrdersInDiscogs()");
