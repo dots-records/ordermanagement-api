@@ -67,7 +67,7 @@ public class ReleaseController {
 
 	// Search releases which in database "Releases"
 	@PostMapping("/searchReleases/page={page}&size={size}")
-	public ResponseEntity<Page<DatabaseRelease>> searchUnarchivedOrders(@RequestBody SearchRequest request,
+	public ResponseEntity<Page<DatabaseRelease>> searchReleases(@RequestBody SearchRequest request,
 			@PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
 		Instant start = Instant.now();
 		logger.info("[TASK START] searchReleases({}, {}, {})", request.getSearch(), size, page);
