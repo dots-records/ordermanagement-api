@@ -15,26 +15,6 @@ public class DatabaseRelease {
 	private List<Artist> artists;
 	private List<Format> formats;
 	
-	private static class Format {
-		private List<String> descriptions;
-		private String name;
-		
-		public List<String> getDescriptions() {
-			return descriptions;
-		}
-		public void setDescriptions(List<String> descriptions) {
-			this.descriptions = descriptions;
-		}
-		public String getName() {
-			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
-		}
-		
-		
-	}
-
 	public Long getId() {
 		return id;
 	}

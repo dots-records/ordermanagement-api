@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,8 @@ import dev.pablito.dots.entity.MessageManager;
 import dev.pablito.dots.entity.DatabaseOrder.DatabaseItem;
 import dev.pablito.dots.entity.DatabaseOrder.Payment;
 import dev.pablito.dots.entity.DatabaseOrder.Provider;
+import dev.pablito.dots.entity.DatabaseRelease;
+import dev.pablito.dots.services.ReleaseService;
 
 @Component
 public class OrderMapper {
@@ -27,10 +30,14 @@ public class OrderMapper {
 	@Value("${discogs.seller.id}")
 	private String sellerId ;
 	
+	@Autowired
+	private ReleaseService releaseService;
+	
     public DatabaseOrder mapToDatabaseOrder(DiscogsOrder order) throws IOException, InterruptedException {
         if (order == null) {
             return null;
         }
+        System.out.println(order.getId());
 
         DatabaseOrder dbOrder = new DatabaseOrder();
         dbOrder.setId(order.getId());
@@ -57,7 +64,6 @@ public class OrderMapper {
         provider.setPrice(0);
         dbOrder.setProvider(provider);
         
-        DiscogsClient client = new DiscogsClient();
         
         // Map Items
         
@@ -65,9 +71,11 @@ public class OrderMapper {
                 .map(item -> {
                     DatabaseOrder.DatabaseItem dbItem = new DatabaseOrder.DatabaseItem();
                     dbItem.setId(item.getId());
-                    DiscogsRelease release;
+                    
+                    DatabaseRelease release;
                     try {
-						release = client.getRelease(item.getRelease().getId());
+                    	release = releaseService.getRelease(item.getRelease().getId());
+                    	
 					} catch (IOException | InterruptedException e) {
 						release = null;
 						e.printStackTrace();

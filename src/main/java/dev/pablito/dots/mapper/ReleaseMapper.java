@@ -22,7 +22,7 @@ public class ReleaseMapper {
         dbRelease.setTitle(release.getTitle());
         dbRelease.setThumb(release.getThumb());
         dbRelease.setArtists(release.getArtists());
-        //dbRelease.setFormats(release.getFormats());
+        dbRelease.setFormats(release.getFormats());
         
 
         return dbRelease;

@@ -38,5 +38,12 @@ public class ReleaseService {
 		PageRequest pageable = PageRequest.of(page, size);
 		return releaseRepository.findBySearchTerm(palabra, pageable);
 	}
+	
+	public DatabaseRelease getRelease(Long id) throws IOException, InterruptedException {
+		System.out.println(id);
+		DatabaseRelease dbRel =  releaseRepository.findById(id).get();
+		System.out.println(dbRel);
+		return releaseRepository.findById(id).get();
+	}
 
 }
