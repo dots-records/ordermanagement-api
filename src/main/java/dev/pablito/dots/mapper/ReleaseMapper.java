@@ -23,8 +23,8 @@ public class ReleaseMapper {
         dbRelease.setThumb(release.getThumb());
         dbRelease.setArtists(release.getArtists());
         dbRelease.setFormats(release.getFormats());
+        dbRelease.setArchived(false);
         
-
         return dbRelease;
     }
 

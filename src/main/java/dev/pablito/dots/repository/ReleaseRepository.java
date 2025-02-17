@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import dev.pablito.dots.entity.DatabaseOrder;
 import dev.pablito.dots.entity.DatabaseRelease;
 
 public interface ReleaseRepository extends MongoRepository<DatabaseRelease, Long> {
@@ -15,4 +16,13 @@ public interface ReleaseRepository extends MongoRepository<DatabaseRelease, Long
 			+ "{ 'formats.name' : { $regex: ?0, $options: 'i' } }, "
 			+ "{ 'formats.descriptions' : { $regex: ?0, $options: 'i' } } " + "] }")
 	Page<DatabaseRelease> findBySearchTerm(String palabra, Pageable pageable);
+	
+	@Query("{ '$or' : [ " + "{ 'title' : { $regex: ?0, $options: 'i' } }, "
+			+ "{ 'thumb' : { $regex: ?0, $options: 'i' } }, " + "{ 'artists.name' : { $regex: ?0, $options: 'i' } }, "
+			+ "{ 'formats.name' : { $regex: ?0, $options: 'i' } }, "
+			+ "{ 'formats.descriptions' : { $regex: ?0, $options: 'i' } } " + "] }")
+	Page<DatabaseRelease> findByArchivedAndSearchTerm(boolean archived, String palabra, Pageable pageable);
+	
+	
+	Page<DatabaseRelease> findByArchived(boolean archived, Pageable pageable);
 }

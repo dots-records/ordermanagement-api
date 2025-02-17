@@ -14,6 +14,7 @@ public class DatabaseRelease {
 	private String thumb;
 	private List<Artist> artists;
 	private List<Format> formats;
+	private boolean archived;
 	
 	public Long getId() {
 		return id;
@@ -54,4 +55,14 @@ public class DatabaseRelease {
 	public void setThumb(String thumb) {
 		this.thumb = thumb;
 	}
+
+	public boolean isArchived() {
+		return archived;
+	}
+
+	public void setArchived(boolean archived) {
+		this.archived = archived;
+	}
+	
+	
 }

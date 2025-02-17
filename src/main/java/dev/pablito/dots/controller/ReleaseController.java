@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.pablito.dots.entity.DatabaseOrder;
 import dev.pablito.dots.entity.DatabaseRelease;
 import dev.pablito.dots.entity.SearchRequest;
 import dev.pablito.dots.services.ReleaseService;
@@ -48,39 +49,121 @@ public class ReleaseController {
 	}
 
 	// Gets all releases from database "Releases"
-	@GetMapping("/getReleases/page={page}&size={size}")
-	public ResponseEntity<Page<DatabaseRelease>> getReleases(@PathVariable int page, @PathVariable int size)
+	@GetMapping("/getAllReleases/page={page}&size={size}")
+	public ResponseEntity<Page<DatabaseRelease>> getAllReleases(@PathVariable int page, @PathVariable int size)
 			throws IOException, InterruptedException {
 		Instant start = Instant.now();
-		logger.info("[TASK START] getReleases({}, {})", page, size);
+		logger.info("[TASK START] getAllReleases({}, {})", page, size);
 		try {
-			Page<DatabaseRelease> response = releaseService.getReleases(page, size);
+			Page<DatabaseRelease> response = releaseService.getAllReleases(page, size);
 			Instant end = Instant.now();
 			long duration = Duration.between(start, end).toSeconds();
-			logger.info("[TASK END] getReleases({}, {}) - {} s ", page, size, duration);
+			logger.info("[TASK END] getAllReleases({}, {}) - {} s ", page, size, duration);
 			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			logger.error("[TASK ERROR] getReleases({}, {})", page, size, e);
+			logger.error("[TASK ERROR] getAllReleases({}, {})", page, size, e);
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	// Gets releases which archived = false from database "Releases"
+	@GetMapping("/getUnarchivedReleases/page={page}&size={size}")
+	public ResponseEntity<Page<DatabaseRelease>> getUnarchivedReleases(@PathVariable int page, @PathVariable int size)
+			throws IOException, InterruptedException {
+		Instant start = Instant.now();
+		logger.info("[TASK START] getUnarchivedReleases({}, {})", page, size);
+		try {
+			Page<DatabaseRelease> response = releaseService.getUnarchivedReleases(page, size);
+			Instant end = Instant.now();
+			long duration = Duration.between(start, end).toSeconds();
+			logger.info("[TASK END] getUnarchivedReleases({}, {}) - {} s ", page, size, duration);
+			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] getUnarchivedReleases({}, {})", page, size, e);
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	// Gets releases which archived = true from database "Releases"
+	@GetMapping("/getArchivedReleases/page={page}&size={size}")
+	public ResponseEntity<Page<DatabaseRelease>> getArchivedReleases(@PathVariable int page, @PathVariable int size)
+			throws IOException, InterruptedException {
+		Instant start = Instant.now();
+		logger.info("[TASK START] getArchivedReleases({}, {})", page, size);
+		try {
+			Page<DatabaseRelease> response = releaseService.getArchivedReleases(page, size);
+			Instant end = Instant.now();
+			long duration = Duration.between(start, end).toSeconds();
+			logger.info("[TASK END] getArchivedReleases({}, {}) - {} s ", page, size, duration);
+			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] getArchivedReleases({}, {})", page, size, e);
 			return ResponseEntity.noContent().build();
 		}
 	}
 
-	// Search releases which in database "Releases"
-	@PostMapping("/searchReleases/page={page}&size={size}")
-	public ResponseEntity<Page<DatabaseRelease>> searchReleases(@RequestBody SearchRequest request,
+	// Search all releases which in database "Releases"
+	@PostMapping("/searchAllReleases/page={page}&size={size}")
+	public ResponseEntity<Page<DatabaseRelease>> searchAllReleases(@RequestBody SearchRequest request,
 			@PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
 		Instant start = Instant.now();
-		logger.info("[TASK START] searchReleases({}, {}, {})", request.getSearch(), size, page);
+		logger.info("[TASK START] searchAllReleases({}, {}, {})", request.getSearch(), size, page);
 		try {
 			Page<DatabaseRelease> response = releaseService.searchReleases(request.getSearch(), page, size);
 			Instant end = Instant.now();
 			long duration = Duration.between(start, end).toSeconds();
-			logger.info("[TASK END] searchReleases({}, {}, {}) - {} s ", request.getSearch(), size, page, duration);
+			logger.info("[TASK END] searchAllReleases({}, {}, {}) - {} s ", request.getSearch(), size, page, duration);
 			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			logger.error("[TASK ERROR] searchReleases({}, {}, {})", request.getSearch(), size, page, e);
+			logger.error("[TASK ERROR] searchAllReleases({}, {}, {})", request.getSearch(), size, page, e);
 			return ResponseEntity.noContent().build();
 		}
+	}
+	
+	// Search releases which archived = false in database "Releases"
+	@PostMapping("/searchUnarchivedReleases/page={page}&size={size}")
+	public ResponseEntity<Page<DatabaseRelease>> searchUnarchivedReleases(@RequestBody SearchRequest request,
+			@PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
+		Instant start = Instant.now();
+		logger.info("[TASK START] searchUnarchivedReleases({}, {}, {})", request.getSearch(), size, page);
+		try {
+			Page<DatabaseRelease> response = releaseService.searchReleasesByArchived(request.getSearch(), page, size, false);
+			Instant end = Instant.now();
+			long duration = Duration.between(start, end).toSeconds();
+			logger.info("[TASK END] searchUnarchivedReleases({}, {}, {}) - {} s ", request.getSearch(), size, page, duration);
+			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] searchUnarchivedReleases({}, {}, {})", request.getSearch(), size, page, e);
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	// Search releases which archived = true in database "Releases"
+	@PostMapping("/searchArchivedReleases/page={page}&size={size}")
+	public ResponseEntity<Page<DatabaseRelease>> searchArchivedReleases(@RequestBody SearchRequest request,
+			@PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
+		Instant start = Instant.now();
+		logger.info("[TASK START] searchArchivedReleases({}, {}, {})", request.getSearch(), size, page);
+		try {
+			Page<DatabaseRelease> response = releaseService.searchReleasesByArchived(request.getSearch(), page, size, true);
+			Instant end = Instant.now();
+			long duration = Duration.between(start, end).toSeconds();
+			logger.info("[TASK END] searchArchivedReleases({}, {}, {}) - {} s ", request.getSearch(), size, page, duration);
+			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] searchArchivedReleases({}, {}, {})", request.getSearch(), size, page, e);
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+		
+		
+	
+	
+	// Delete selected releases identified by id which in database "Releases"
+	@PostMapping("/deleteReleases")
+	public void deleteReleases() {
+		
 	}
 
 }
