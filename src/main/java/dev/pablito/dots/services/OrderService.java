@@ -82,7 +82,8 @@ public class OrderService {
 		if (ordersInfoRepository.findAll().isEmpty()) {
 			OrdersInfo new_info = new OrdersInfo();
 			// Defined to last year to get all orders created after
-			new_info.setCreatedAfter("2025-01-01T08:43:03.9248907-08:00");
+			new_info.setCreatedAfter("2024-01-01T08:43:03.9248907-08:00");
+			
 			ordersInfoRepository.insert(new_info);
 		}
 		List<DatabaseOrder> added_orders_database = new ArrayList<DatabaseOrder>();

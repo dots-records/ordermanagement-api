@@ -3,6 +3,8 @@ package dev.pablito.dots.controller;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,12 @@ public class ReleaseController {
 			logger.error("[TASK ERROR] putReleaseFromDiscogs({})", id, e);
 		}
 	}
+	
+	@GetMapping("/buclePutRelease")
+	public void buclePutRelease() throws IOException, InterruptedException {
+	    releaseService.putReleaseFromDiscogs(33052227L);
+	}
+
 
 	// Gets all releases from database "Releases"
 	@GetMapping("/getAllReleases/page={page}&size={size}")
@@ -102,6 +110,7 @@ public class ReleaseController {
 		}
 	}
 
+	//TODO: Cambiar a get
 	// Search all releases which in database "Releases"
 	@PostMapping("/searchAllReleases/page={page}&size={size}")
 	public ResponseEntity<Page<DatabaseRelease>> searchAllReleases(@RequestBody SearchRequest request,
@@ -120,6 +129,7 @@ public class ReleaseController {
 		}
 	}
 	
+	//TODO: Cambiar a get
 	// Search releases which archived = false in database "Releases"
 	@PostMapping("/searchUnarchivedReleases/page={page}&size={size}")
 	public ResponseEntity<Page<DatabaseRelease>> searchUnarchivedReleases(@RequestBody SearchRequest request,
@@ -128,6 +138,7 @@ public class ReleaseController {
 		logger.info("[TASK START] searchUnarchivedReleases({}, {}, {})", request.getSearch(), size, page);
 		try {
 			Page<DatabaseRelease> response = releaseService.searchReleasesByArchived(request.getSearch(), page, size, false);
+			
 			Instant end = Instant.now();
 			long duration = Duration.between(start, end).toSeconds();
 			logger.info("[TASK END] searchUnarchivedReleases({}, {}, {}) - {} s ", request.getSearch(), size, page, duration);
@@ -138,6 +149,7 @@ public class ReleaseController {
 		}
 	}
 	
+	//TODO: Cambiar a get
 	// Search releases which archived = true in database "Releases"
 	@PostMapping("/searchArchivedReleases/page={page}&size={size}")
 	public ResponseEntity<Page<DatabaseRelease>> searchArchivedReleases(@RequestBody SearchRequest request,
@@ -157,13 +169,50 @@ public class ReleaseController {
 	}
 	
 		
-		
-	
-	
 	// Delete selected releases identified by id which in database "Releases"
 	@PostMapping("/deleteReleases")
-	public void deleteReleases() {
+	public void deleteReleases(@RequestBody List<Long> ids) {
+		Instant start = Instant.now();
+		logger.info("[TASK START] deleteReleases({})", ids);
+		try {
+			releaseService.deleteReleases(ids);
+			Instant end = Instant.now();
+			long duration = Duration.between(start, end).toSeconds();
+			logger.info("[TASK END] deleteReleases({})", ids);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] deleteReleases({})", ids, e);
+		}
 		
+	}
+	
+	// Archive selected releases identified by id which in database "Releases"
+	@PostMapping("/archiveReleases")
+	public void archiveReleases(@RequestBody List<Long> ids) {
+		Instant start = Instant.now();
+		logger.info("[TASK START] archiveReleases({})", ids);
+		try {
+			releaseService.archiveReleases(ids);
+			Instant end = Instant.now();
+			long duration = Duration.between(start, end).toSeconds();
+			logger.info("[TASK END] archiveReleases({})", ids);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] archiveReleases({})", ids, e);
+		}	
+	}
+	
+	// Unarchive selected releases identified by id which in database "Releases"
+	@PostMapping("/unarchiveReleases")
+	public void unarchiveReleases(@RequestBody List<Long> ids) {
+		Instant start = Instant.now();
+		logger.info("[TASK START] unarchiveReleases({})", ids);
+		try {
+			releaseService.unarchiveReleases(ids);
+			Instant end = Instant.now();
+			long duration = Duration.between(start, end).toSeconds();
+			logger.info("[TASK END] unarchiveReleases({})", ids);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] unarchiveReleases({})", ids, e);
+		}	
 	}
 
 }

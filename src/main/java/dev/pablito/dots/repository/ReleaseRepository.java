@@ -17,12 +17,18 @@ public interface ReleaseRepository extends MongoRepository<DatabaseRelease, Long
 			+ "{ 'formats.descriptions' : { $regex: ?0, $options: 'i' } } " + "] }")
 	Page<DatabaseRelease> findBySearchTerm(String palabra, Pageable pageable);
 	
-	@Query("{ '$or' : [ " + "{ 'title' : { $regex: ?0, $options: 'i' } }, "
-			+ "{ 'thumb' : { $regex: ?0, $options: 'i' } }, " + "{ 'artists.name' : { $regex: ?0, $options: 'i' } }, "
-			+ "{ 'formats.name' : { $regex: ?0, $options: 'i' } }, "
-			+ "{ 'formats.descriptions' : { $regex: ?0, $options: 'i' } } " + "] }")
-	Page<DatabaseRelease> findByArchivedAndSearchTerm(boolean archived, String palabra, Pageable pageable);
-	
+	@Query("{ '$and': [ "
+	        + "{ 'archived': ?1 }, "
+	        + "{ '$or': [ "
+	            + "{ 'title': { $regex: ?0, $options: 'i' } }, "
+	            + "{ 'thumb': { $regex: ?0, $options: 'i' } }, "
+	            + "{ 'artists.name': { $regex: ?0, $options: 'i' } }, "
+	            + "{ 'formats.name': { $regex: ?0, $options: 'i' } }, "
+	            + "{ 'formats.descriptions': { $regex: ?0, $options: 'i' } } "
+	        + "] } "
+	    + "] }")
+	Page<DatabaseRelease> findByArchivedAndSearchTerm(String palabra, boolean archived, Pageable pageable);
+
 	
 	Page<DatabaseRelease> findByArchived(boolean archived, Pageable pageable);
 }

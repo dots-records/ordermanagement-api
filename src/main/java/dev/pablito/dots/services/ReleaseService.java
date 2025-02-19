@@ -56,14 +56,36 @@ public class ReleaseService {
 	
 	public Page<DatabaseRelease> searchReleasesByArchived(String palabra, int page, int size, boolean archived) {
 		PageRequest pageable = PageRequest.of(page, size);
-		return releaseRepository.findByArchivedAndSearchTerm(archived, palabra, pageable);
+		return releaseRepository.findByArchivedAndSearchTerm(palabra, archived, pageable);
 	}
 	
 	public DatabaseRelease getRelease(Long id) throws IOException, InterruptedException {
-		System.out.println(id);
 		DatabaseRelease dbRel =  releaseRepository.findById(id).get();
-		System.out.println(dbRel);
 		return releaseRepository.findById(id).get();
+	}
+	
+	public void deleteReleases(List<Long> ids) {
+	    releaseRepository.deleteAllById(ids);
+	}
+	
+	public void archiveReleases(List<Long> ids) {
+	    List<DatabaseRelease> releases = releaseRepository.findAllById(ids);
+	    for (DatabaseRelease release : releases) {
+	        release.setArchived(true);
+	    }
+	    releaseRepository.saveAll(releases);
+	}
+	
+	public void unarchiveReleases(List<Long> ids) {
+	    List<DatabaseRelease> releases = releaseRepository.findAllById(ids);
+	    for (DatabaseRelease release : releases) {
+	        release.setArchived(false);
+	    }
+	    releaseRepository.saveAll(releases);
+	}
+	
+	public boolean contains(Long id) {
+	    return releaseRepository.existsById(id);
 	}
 	
 	

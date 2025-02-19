@@ -73,7 +73,12 @@ public class OrderMapper {
                     dbItem.setId(item.getId());
                     
                     DatabaseRelease release;
+                    
                     try {
+                    	if(!releaseService.contains(item.getRelease().getId())) {
+                        	releaseService.putReleaseFromDiscogs(item.getRelease().getId());
+                    	}
+                    	
                     	release = releaseService.getRelease(item.getRelease().getId());
                     	
 					} catch (IOException | InterruptedException e) {
