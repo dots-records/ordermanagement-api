@@ -60,7 +60,6 @@ public class ReleaseService {
 	}
 	
 	public DatabaseRelease getRelease(Long id) throws IOException, InterruptedException {
-		DatabaseRelease dbRel =  releaseRepository.findById(id).get();
 		return releaseRepository.findById(id).get();
 	}
 	

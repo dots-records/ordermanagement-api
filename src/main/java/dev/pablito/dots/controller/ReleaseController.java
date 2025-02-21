@@ -50,9 +50,21 @@ public class ReleaseController {
 		}
 	}
 	
-	@GetMapping("/buclePutRelease")
-	public void buclePutRelease() throws IOException, InterruptedException {
-	    releaseService.putReleaseFromDiscogs(33052227L);
+	// Gets release identified by "id" from database "Releases"
+	@GetMapping("/getRelease/{id}")
+	public ResponseEntity<DatabaseRelease>getRelease(@PathVariable Long id) throws IOException, InterruptedException {
+		Instant start = Instant.now();
+        logger.info("[TASK START] getRelease({})", id);
+        try {
+        	DatabaseRelease response = releaseService.getRelease(id);
+            Instant end = Instant.now();
+            long duration = Duration.between(start, end).toSeconds();
+            logger.info("[TASK END] getRelease({}) - {} s ", id, duration);
+            return new ResponseEntity<DatabaseRelease>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("[TASK ERROR] getRelease({})", id, e);
+            return ResponseEntity.noContent().build();
+        }
 	}
 
 
