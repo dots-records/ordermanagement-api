@@ -46,6 +46,18 @@
         </rollingPolicy>
     </appender>
 
+    <!-- Appender para logs de servicios -->
+    <appender name="SERVICES_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_DIR}/services.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS_DIR}/services-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
     <!-- 📌 Logger para logs generales -->
     <logger name="dev.pablito.dots" level="INFO" additivity="false">
         <appender-ref ref="GENERAL_LOG"/>
@@ -60,6 +72,10 @@
     <logger name="dev.pablito.dots.controller" level="INFO" additivity="false">
         <appender-ref ref="TASKS_LOG"/>
         <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="dev.pablito.dots.services" level="INFO" additivity="false">
+        <appender-ref ref="SERVICES_LOG"/>
     </logger>
 
     <!-- 🌍 Logger raíz -->

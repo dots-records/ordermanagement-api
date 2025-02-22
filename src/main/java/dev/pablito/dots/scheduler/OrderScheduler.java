@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
+import dev.pablito.dots.aop.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +27,11 @@ public class OrderScheduler {
 	
 	// TODO: Hacer q cuando falle tambien guarde el ordersInformation
 	//Every 60 seconds updates the database "Orders" checking if a new Order has been made in Discogs
+	@Timed
 	@Scheduled(fixedRate = 60000)
 	public void checkOrdersInDiscogs() {
-		Instant start = Instant.now();
-        logger.info("[SCHEDULED START] checkOrdersInDiscogs()");
         try {
         	orderService.checkOrdersInDiscogs();
-            Instant end = Instant.now();
-            long duration = Duration.between(start, end).toSeconds();
-            logger.info("[SCHEDULED END] checkOrdersInDiscogs() - {} s ", duration);
         } catch (Exception e) {
             logger.error("[SCHEDULED ERROR] checkOrdersInDiscogs() ", e);
         }

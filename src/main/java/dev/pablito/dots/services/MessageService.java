@@ -1,15 +1,6 @@
 package dev.pablito.dots.services;
 
-import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
+import dev.pablito.dots.aop.Timed;
 import dev.pablito.dots.api.discogs.DiscogsClient;
 import dev.pablito.dots.entity.DatabaseNotification;
 import dev.pablito.dots.entity.DatabaseOrder;
@@ -17,6 +8,16 @@ import dev.pablito.dots.entity.Message;
 import dev.pablito.dots.entity.MessageManager;
 import dev.pablito.dots.repository.NotificationRepository;
 import dev.pablito.dots.repository.OrderRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MessageService {
@@ -29,8 +30,10 @@ public class MessageService {
 	private DiscogsClient discogsClient;
 	@Value("${discogs.seller.id}")
 	private String sellerId ;
-	
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(MessageService.class);
+
+	@Timed
 	public void updateUnarchivedMessages() throws Exception {
 		List<DatabaseOrder> orders = new ArrayList<>();
 		orders.addAll(orderRepository.findByArchived(false));
@@ -41,7 +44,8 @@ public class MessageService {
 		}
 		
 	}
-	
+
+	@Timed
 	public void updateArchivedMessages() throws Exception {
 		List<DatabaseOrder> orders = new ArrayList<>();
 		orders.addAll(orderRepository.findByArchived(false));

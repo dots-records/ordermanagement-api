@@ -9,6 +9,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import dev.pablito.dots.aop.Timed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +38,11 @@ public class OrderService {
 	@Autowired
 	private OrderMapper orderMapper;
 
+	private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
+
 	// Function: Get orders from Database
 
+	@Timed
 	public List<DatabaseOrder> getUnarchivedNewOrders() throws IOException, InterruptedException {
 		// Crear una lista que contenga los pedidos con "archived = false" y el estado
 		// deseado
@@ -50,6 +56,7 @@ public class OrderService {
 		return orders;
 	}
 
+	@Timed
 	public Page<DatabaseOrder> getUnarchivedOrders(int page, int size) throws IOException, InterruptedException {
 		List<DatabaseOrder> orders = new ArrayList<>();
 		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "number"));
@@ -57,6 +64,7 @@ public class OrderService {
 		return orderPage;
 	}
 
+	@Timed
 	public Page<DatabaseOrder> getArchivedOrders(int page, int size) throws IOException, InterruptedException {
 		List<DatabaseOrder> orders = new ArrayList<>();
 		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "number"));
@@ -64,6 +72,7 @@ public class OrderService {
 		return orderPage;
 	}
 
+	@Timed
 	public Page<DatabaseOrder> getAllOrders(int page, int size) throws IOException, InterruptedException {
 		List<DatabaseOrder> orders = new ArrayList<>();
 		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "number"));
@@ -71,12 +80,14 @@ public class OrderService {
 		return orderPage;
 	}
 
+	@Timed
 	public DatabaseOrder getOrder(String id) throws IOException, InterruptedException {
 		return orderRepository.findOrderById(id).get();
 	}
 
 	// Checks if a new order has been made in Discogs and updates the database
 	// "Orders"
+	@Timed
 	public void checkOrdersInDiscogs() throws Exception {
 		// If there is not an OrdersInformation item, creates one
 		if (ordersInfoRepository.findAll().isEmpty()) {
@@ -102,6 +113,7 @@ public class OrderService {
 		ordersInfoRepository.insert(new_info);
 	}
 
+	@Timed
 	public Page<DatabaseOrder> searchOrdersByArchived(String palabra, int page, int size, boolean archived) {
 		// Crear el Pageable con la página y el tamaño, puedes agregar un orden si lo
 		// necesitas
@@ -109,6 +121,7 @@ public class OrderService {
 		return orderRepository.findByArchivedAndSearchTerm(archived, palabra, pageable);
 	}
 
+	@Timed
 	public Page<DatabaseOrder> searchOrders(String palabra, int page, int size) {
 		// Crear el Pageable con la página y el tamaño, puedes agregar un orden si lo
 		// necesitas
@@ -117,6 +130,7 @@ public class OrderService {
 	}
 
 	// From Discogs
+	@Timed
 	public DiscogsOrder getOrderFromDiscogs(String id) throws IOException, InterruptedException {
 		DiscogsOrder order = discogsClient.getDiscogsOrder(id);
 		if (order != null) {
@@ -125,12 +139,14 @@ public class OrderService {
 		return order;
 	}
 
+	@Timed
 	public List<Message> getDiscogsMessages(String id) throws IOException, InterruptedException {
 		return discogsClient.getDiscogsMessages(id).getMessages();
 	}
 
 	// From Database
 
+	@Timed
 	public String createListings() throws IOException, InterruptedException {
 		ArrayList<Long> listings = new ArrayList<>();
 
@@ -189,7 +205,7 @@ public class OrderService {
 
 	// Other
 
-	public String getActualDate() {
+	private String getActualDate() {
 		ZoneOffset zonaHoraria = ZoneOffset.of("-08:00"); // UTC-8
 		OffsetDateTime horaActual = OffsetDateTime.now(zonaHoraria);
 		return horaActual.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
@@ -197,17 +213,17 @@ public class OrderService {
 
 	// CONVERT
 
-	public DatabaseOrder convertDiscogsOrder(DiscogsOrder order) throws IOException, InterruptedException {
+	private DatabaseOrder convertDiscogsOrder(DiscogsOrder order) throws IOException, InterruptedException {
 		return orderMapper.mapToDatabaseOrder(order);
 	}
 
 	// CREATE
 
-	public DatabaseOrder createDatabaseOrder(DatabaseOrder order) {
+	private DatabaseOrder createDatabaseOrder(DatabaseOrder order) {
 		return orderRepository.insert(order);
 	}
 
-	public DatabaseOrder createDatabaseOrderFromDiscogs(String id) throws IOException, InterruptedException {
+	private DatabaseOrder createDatabaseOrderFromDiscogs(String id) throws IOException, InterruptedException {
 		return createDatabaseOrder(convertDiscogsOrder(getOrderFromDiscogs(id)));
 	}
 
@@ -229,6 +245,7 @@ public class OrderService {
 
 	// UPDATE
 
+	@Timed
 	public Optional<DatabaseOrder> updateOrderStatusInDatabase(String id, String new_status) {
 		return orderRepository.findById(id).map(order -> {
 			// Actualizar el estado del pedido
@@ -243,6 +260,7 @@ public class OrderService {
 	// ordenen por fecha despues a la hora de hacer
 	// el get de MongoDb
 
+	@Timed
 	public DiscogsOrder updateOrderStatusInDiscogs(String id, String new_status)
 			throws IOException, InterruptedException {
 		return discogsClient.updateOrderStatus(id, new_status);

@@ -1,4 +1,5 @@
 package dev.pablito.dots.scheduler;
+import dev.pablito.dots.aop.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
@@ -28,14 +29,10 @@ public class MessagesScheduler {
 	// TODO: Change fixedRate to the number of orders * 1000
 	// Updates messages of unarchived orders from database "Orders" every 5 min
 	//@Scheduled(fixedRate = 300000) // 5 minutos
+    @Timed
     public void updateUnarchivedMessages() {
-        Instant start = Instant.now();
-        logger.info("[SCHEDULED START] updateUnarchivedMessages()");
         try {
         	messageService.updateUnarchivedMessages();
-            Instant end = Instant.now();
-            long duration = Duration.between(start, end).toSeconds();
-            logger.info("[SCHEDULED END] updateUnarchivedMessages() - {} s ", duration);
         } catch (Exception e) {
             logger.error("[SCHEDULED ERROR] updateUnarchivedMessages() ", e);
         }
@@ -43,14 +40,10 @@ public class MessagesScheduler {
 	
 	// TODO: This has to be done only in the night
 	// Updates messages of archived orders from database "Orders"
+    @Timed
 	public void updateArchivedMessages() {
-		Instant start = Instant.now();
-        logger.info("[SCHEDULED START] updateArchivedMessages()");
         try {
         	messageService.updateArchivedMessages();
-            Instant end = Instant.now();
-            long duration = Duration.between(start, end).toSeconds();
-            logger.info("[SCHEDULED END] updateArchivedMessages() - {} s ", duration);
         } catch (Exception e) {
             logger.error("[SCHEDULED ERROR] updateArchivedMessages() ", e);
         }
