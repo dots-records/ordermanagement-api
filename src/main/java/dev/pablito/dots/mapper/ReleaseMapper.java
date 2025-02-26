@@ -24,7 +24,7 @@ public class ReleaseMapper {
         dbRelease.setArtists(release.getArtists());
         dbRelease.setFormats(release.getFormats());
         dbRelease.setArchived(false);
-        
+        dbRelease.setImages(release.getImages());
         return dbRelease;
     }
 

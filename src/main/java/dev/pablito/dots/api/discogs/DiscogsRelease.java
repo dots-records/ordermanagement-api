@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 
 import dev.pablito.dots.entity.Artist;
 import dev.pablito.dots.entity.Format;
+import dev.pablito.dots.entity.Image;
 
 public class DiscogsRelease {
 	@Id
@@ -14,6 +15,7 @@ public class DiscogsRelease {
 	private String thumb;
 	private List<Artist> artists;
 	private List<Format> formats;
+	private List<Image> images;
 	
 
 	public Long getId() {
@@ -55,5 +57,15 @@ public class DiscogsRelease {
 	public void setThumb(String thumb) {
 		this.thumb = thumb;
 	}
+
+	public List<Image> getImages() {
+		return images;
+	}
+
+	public void setImages(List<Image> images) {
+		this.images = images;
+	}
+	
+	
 	
 }
