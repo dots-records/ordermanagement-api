@@ -116,11 +116,6 @@ public class DiscogsClient {
 	}
 	
 	
-	
-	
-	
-	
-	
 	public DiscogsRelease getRelease(Long id) throws IOException, InterruptedException {
 		// Cliente HTTP
 		HttpClient client = HttpClient.newHttpClient();
