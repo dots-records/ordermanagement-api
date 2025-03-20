@@ -15,14 +15,15 @@ public class DatabaseListing {
 	private Long releaseId;
 	private String type;
 	private String link;
+	private Double price;
 	
 	
-	public DatabaseListing(Long releaseId, String type, String link) {
+	public DatabaseListing(Long releaseId, String type, String link, Double price) {
 		super();
 		this.releaseId = releaseId;
 		this.type = type;
 		this.link = link;
-	}
+		this.price = price;	}
 	
 	public Long getReleaseId() {
 		return releaseId;
@@ -42,7 +43,13 @@ public class DatabaseListing {
 	public void setLink(String link) {
 		this.link = link;
 	}
-	
-	
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
 	
 }

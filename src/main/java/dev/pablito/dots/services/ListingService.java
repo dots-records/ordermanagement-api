@@ -23,7 +23,7 @@ public class ListingService {
 	
 	@Timed
 	public void createListing(long releaseId) throws IOException, InterruptedException {
-		DatabaseListing listing = new DatabaseListing(releaseId, "Vinted", "hola.com");
+		DatabaseListing listing = new DatabaseListing(releaseId, "Vinted", "hola.com", 1.4);
 		listingRepository.insert(listing);
 	}
 	

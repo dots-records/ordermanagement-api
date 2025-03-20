@@ -100,7 +100,7 @@ public class OrderController {
 	@PostMapping("/updateStatusOrder/{id}/{newStatus}")
 	public void updateStatusOrder(@PathVariable String id, @PathVariable String newStatus) {
         try {
-        	orderService.updateOrderStatusInDiscogs(id, newStatus);
+        	//orderService.updateOrderStatusInDiscogs(id, newStatus);
     		orderService.updateOrderStatusInDatabase(id, newStatus);
         } catch (Exception e) {
             logger.error("[TASK ERROR] updateStatusOrder({}, {})", id, newStatus, e);
