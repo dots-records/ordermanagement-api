@@ -42,7 +42,7 @@ public interface OrderRepository extends MongoRepository<DatabaseOrder, String>{
 	
 	@Query("{ '$or' : [ " +
             "{ 'type' : { $regex: ?0, $options: 'i' } }, " +
-            "{ 'number' : { $regex: ?0, $options: 'i' } }, " +
+            "{ 'id' : { $regex: ?0, $options: 'i' } }, " +
             "{ 'status' : { $regex: ?0, $options: 'i' } }, " +
             "{ 'created' : { $regex: ?0, $options: 'i' } }, " +
             "{ 'delivery_date' : { $regex: ?0, $options: 'i' } }, " +

@@ -40,13 +40,16 @@ public class OrderMapper {
         System.out.println(order.getId());
 
         DatabaseOrder dbOrder = new DatabaseOrder();
-        dbOrder.setId(order.getId());
+        dbOrder.setDiscogsId(order.getId());
         dbOrder.setType("Discogs");
         String replace = "^" + sellerId +"-";
-        dbOrder.setNumber(order.getId().replaceFirst(replace, ""));
+        String numberStr = order.getId().replaceFirst(replace, "");
+        dbOrder.setId("D" + numberStr);
+        
         dbOrder.setStatus(order.getStatus());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy", Locale.ENGLISH);
         dbOrder.setCreated(ZonedDateTime.parse(order.getCreated()).format(formatter));
+        dbOrder.setCreatedComplete(order.getCreated());
         dbOrder.setArchived(order.isArchived());
         dbOrder.setRevenue(order.getRevenue());
         

@@ -131,7 +131,12 @@ public class OrderController {
 		return new ResponseEntity<Page<DatabaseOrder>>(orderService.searchOrders(request.getSearch(), page, size), HttpStatus.OK);
 	}
 	
-	
+	@Timed
+	@GetMapping("/getOrdersInformation")
+	public ResponseEntity<String>getOrdersInformation() throws Exception {
+		return new ResponseEntity<String>(orderService.getOrdersInformation(), HttpStatus.OK);
+		
+	}
 	
 	// Testing : Releases
 	

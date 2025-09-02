@@ -74,7 +74,7 @@ public class MessageService {
 	
 	public void updateMessages(DatabaseOrder order) throws Exception {
 		
-		MessageManager mmDs = discogsClient.getDiscogsMessages(order.getId());
+		MessageManager mmDs = discogsClient.getDiscogsMessages(order.getDiscogsId());
 		List<Message> messagesDs = mmDs.getMessages();
 		Integer newMessagesCustomerBackup = order.getNewMessagesCustomer();
 		Integer newMessagesSellerBackup = order.getNewMessagesSeller();

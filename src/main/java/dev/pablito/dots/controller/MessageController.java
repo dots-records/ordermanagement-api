@@ -41,6 +41,7 @@ public class MessageController {
 	@PostMapping("updateMessages/{id}")
 	public void updateMessages(@PathVariable String id) {
         try {
+        
         	messageService.updateMessages(orderService.getOrder(id));
         } catch (Exception e) {
             logger.error("[TASK ERROR] updateMessages({}) ", id, e);

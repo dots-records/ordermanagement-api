@@ -16,11 +16,12 @@ import lombok.NoArgsConstructor;
 public class DatabaseOrder {
 	@Id
 	private String id;
+	private String discogsId;
 	private String type;
-	private String number;
 	private List<DatabaseItem> items;
 	private String status;
 	private String created;
+	private String createdComplete;
 	private boolean archived;
 	private Payment payment;
 	private Double revenue;
@@ -107,12 +108,12 @@ public class DatabaseOrder {
 		}
 	}
 
-	public String getId() {
-		return id;
+	public String getDiscogsId() {
+		return discogsId;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setDiscogsId(String discogsId) {
+		this.discogsId = discogsId;
 	}
 
 	public List<DatabaseItem> getItems() {
@@ -179,12 +180,12 @@ public class DatabaseOrder {
 		this.delivery_date = delivery_date;
 	}
 
-	public String getNumber() {
-		return number;
+	public String getId() {
+		return id;
 	}
 
-	public void setNumber(String number) {
-		this.number = number;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public boolean isNotified() {
@@ -234,6 +235,16 @@ public class DatabaseOrder {
 	public void setNewMessagesDiscogs(Integer newMessagesDiscogs) {
 		this.newMessagesDiscogs = newMessagesDiscogs;
 	}
+
+	public String getCreatedComplete() {
+		return createdComplete;
+	}
+
+	public void setCreatedComplete(String createdComplete) {
+		this.createdComplete = createdComplete;
+	}
+	
+	
 
 	
 	
