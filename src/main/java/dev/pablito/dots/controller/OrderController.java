@@ -138,14 +138,7 @@ public class OrderController {
 		
 	}
 	
-	// Testing : Releases
 	
-	
-	
-	@GetMapping("createListings")
-	public ResponseEntity<String> createListings() throws IOException, InterruptedException {
-		return new ResponseEntity<String>(orderService.createListings(), HttpStatus.CREATED);
-	}
 	
 	
 	

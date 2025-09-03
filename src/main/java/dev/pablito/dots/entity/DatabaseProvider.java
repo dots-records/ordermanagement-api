@@ -16,16 +16,20 @@ public class DatabaseProvider {
 	private Double price;
 	private String link;
 	private Integer units;
+	private String condition;
 	
 	
-	public DatabaseProvider(Long releaseId, String type, Double price, String link, Integer units) {
+	public DatabaseProvider(Long releaseId, String type, Double price, String link, Integer units, String condition) {
 		super();
 		this.releaseId = releaseId;
 		this.type = type;
 		this.price = price;
 		this.link = link;
 		this.units = units;
+		this.condition = condition;
 	}
+	
+	
 	
 	public Long getReleaseId() {
 		return releaseId;
@@ -56,6 +60,18 @@ public class DatabaseProvider {
 	}
 	public void setUnits(Integer units) {
 		this.units = units;
+	}
+
+
+
+	public String getCondition() {
+		return condition;
+	}
+
+
+
+	public void setCondition(String condition) {
+		this.condition = condition;
 	}
 	
 	

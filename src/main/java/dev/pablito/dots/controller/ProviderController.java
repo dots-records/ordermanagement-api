@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.pablito.dots.aop.Timed;
 import dev.pablito.dots.entity.DatabaseListing;
 import dev.pablito.dots.entity.DatabaseProvider;
+import dev.pablito.dots.entity.ProviderRequest;
 import dev.pablito.dots.services.ListingService;
 import dev.pablito.dots.services.ProviderService;
 
@@ -33,12 +35,12 @@ public class ProviderController {
 
 	@Timed
 	@PostMapping("/createProvider/releaseId={releaseId}")
-	public void createProvider(@PathVariable Long releaseId)
+	public void createProvider(@PathVariable Long releaseId, @RequestBody ProviderRequest request)
 			throws IOException, InterruptedException {
 		try {
-			providerService.createProvider(releaseId);
+			providerService.createProvider(releaseId, request);
 		} catch (Exception e) {
-			logger.error("[TASK ERROR] createProvider({})", releaseId, e);
+			logger.error("[TASK ERROR] createProvider({} {})", releaseId, request, e);
 		}
 	}
 	

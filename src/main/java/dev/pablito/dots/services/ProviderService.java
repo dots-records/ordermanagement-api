@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import dev.pablito.dots.aop.Timed;
 import dev.pablito.dots.entity.DatabaseProvider;
+import dev.pablito.dots.entity.ProviderRequest;
 import dev.pablito.dots.repository.ListingRepository;
 import dev.pablito.dots.repository.ProviderRepository;
 
@@ -18,9 +19,16 @@ public class ProviderService {
 	private ProviderRepository providerRepository;
 	
 	@Timed
-	public void createProvider(long releaseId) throws IOException, InterruptedException {
-		DatabaseProvider provider = new DatabaseProvider(releaseId, "Stock", 1.4, null, 1 );
-		providerRepository.insert(provider);
+	public void createProvider(long releaseId, ProviderRequest request) throws IOException, InterruptedException {
+		DatabaseProvider provider;
+		if(request.getType().equals("Stock")) {
+			provider = new DatabaseProvider(releaseId, "Stock", request.getPrice(), null, request.getUnits(), request.getCondition());
+			providerRepository.insert(provider);
+		} else if (request.getType().equals("Online")) {
+			provider = new DatabaseProvider(releaseId, "Online", request.getPrice(), request.getLink(), null, null);
+			providerRepository.insert(provider);
+		}
+		
 	}
 	
 	@Timed
