@@ -23,6 +23,8 @@ public interface OrderRepository extends MongoRepository<DatabaseOrder, String>{
 	
 	List<DatabaseOrder> findByStatusAndArchived(String status, boolean archived);
 	
+	List<DatabaseOrder> findByStatusAndArchivedAndType(String status, boolean archived, String type);
+	
 	@Query("{ 'archived' : ?0, " + 
 	           "'$or' : [ " +
 	               "{ 'type' : { $regex: ?1, $options: 'i' } }, " +

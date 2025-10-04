@@ -28,10 +28,20 @@ public class OrderScheduler {
             orderService.checkOrdersInDiscogs();
         } catch (Exception e) {
             logger.error("[SCHEDULED ERROR] checkOrdersInDiscogs() ", e);
-            
-        }
-        
+        }   
     }
+    
+    @Timed
+    @Scheduled(fixedRate = 360000)
+    public void updateUpdatableDiscogsOrders() {
+        try {
+            orderService.updateUpdatableDiscogsOrders();
+        } catch (Exception e) {
+            logger.error("[SCHEDULED ERROR] updateUpdatableDiscogsOrders() ", e);
+        }   
+    }
+    
+    
 
 }
 

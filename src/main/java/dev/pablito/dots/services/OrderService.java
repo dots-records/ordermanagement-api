@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.transaction.annotation.Transactional;
 import dev.pablito.dots.aop.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,6 @@ public class OrderService {
 		orders.addAll(orderRepository.findByStatusAndArchived("Invoice Sent", false));
 		orders.addAll(orderRepository.findByStatusAndArchived("Payment Pending", false));
 		
-
 		return orders;
 	}
 
@@ -84,37 +84,79 @@ public class OrderService {
 		return orderRepository.findOrderById(id).get();
 	}
 
+	@Timed
+	public void updateUpdatableDiscogsOrders() throws Exception {
+		List<DatabaseOrder> orders = new ArrayList<>();
+		orders.addAll(orderRepository.findByStatusAndArchivedAndType("Other", false, "Discogs"));
+		orders.addAll(orderRepository.findByStatusAndArchivedAndType("Invoice Sent", false, "Discogs"));
+		orders.addAll(orderRepository.findByStatusAndArchivedAndType("Payment Pending", false, "Discogs"));
+		List<DiscogsOrder> updateOrdersDiscogs = new ArrayList<>();
+		for(DatabaseOrder orderDB: orders) {
+			System.out.println(orderDB.getDiscogsId());
+		    DiscogsOrder orderDS = discogsClient.getDiscogsOrder(orderDB.getDiscogsId());
+		    String statusDS = orderDS.getStatus();
+		    if(!(statusDS.equals("Payment Pending") || statusDS.equals("Invoice Sent") 
+		     		|| statusDS.equals("Payment Received") || statusDS.equals("In Progress")
+		    		|| statusDS.equals("Shipped") || statusDS.equals("Cancelled (Non-Paying Buyer)")
+		       		|| statusDS.equals("Cancelled (Item Unavailable)") 
+		       		|| statusDS.equals("Cancelled (Per Buyer's Request)"))) {
+		    	statusDS = "Other";
+			} 
+		    if(!statusDS.equals(orderDB.getStatus())) {
+		    	updateOrdersDiscogs.add(orderDS);
+		    }
+		}
+	    List<DatabaseOrder> updateOrdersDB = updateOrdersDiscogs.stream()
+	        .map(order -> {
+	            try {
+	                return orderMapper.mapToDatabaseOrder(order);
+	            } catch (IOException | InterruptedException e) {
+	                throw new RuntimeException("Error al convertir DiscogsOrder", e);
+	            }
+	        })
+	        .toList();
+	    saveOrders(updateOrdersDB);
+	}
+	
+	@Transactional(rollbackFor = Exception.class)
+	protected void saveOrders(List<DatabaseOrder> dbOrders) {
+		orderRepository.saveAll(dbOrders);
+		
+	}
 	// Checks if a new order has been made in Discogs and updates the database
-	// "Orders"
 	@Timed
 	public void checkOrdersInDiscogs() throws Exception {
-		// If there is not an OrdersInformation item, creates one
-		try {
-			if (ordersInfoRepository.findAll().isEmpty()) {
-				OrdersInfo new_info = new OrdersInfo();
-				// Defined to last year to get all orders created after
-				new_info.setCreatedAfter("2024-01-01T08:43:03.9248907-08:00");
-				
-				ordersInfoRepository.insert(new_info);
-			}
-			List<DatabaseOrder> added_orders_database = new ArrayList<DatabaseOrder>();
-			OrdersInfo info = ordersInfoRepository.findAll().getFirst();
-			ordersInfoRepository.delete(info);
-			String createdAfter = info.getCreatedAfter();
-			List<DiscogsOrder> orders_discogs = discogsClient.getDiscogsOrdersCreatedAfter(createdAfter);
-			for (DiscogsOrder order : orders_discogs) {
-				DatabaseOrder orderDb = createDatabaseOrder(convertDiscogsOrder(order));
-				added_orders_database.addLast(orderDb);
-			}
-			OrdersInfo new_info = new OrdersInfo();
-			new_info.setCreatedAfter(getActualDate());
-			ordersInfoRepository.insert(new_info);
-		} catch (Exception e) {
-			OrdersInfo new_info = new OrdersInfo();
-			new_info.setCreatedAfter(getActualDate());
-			ordersInfoRepository.insert(new_info);
-		}
+	    if (ordersInfoRepository.findAll().isEmpty()) {
+	        OrdersInfo new_info = new OrdersInfo();
+	        new_info.setCreatedAfter("1900-01-01T08:43:03.9248907-07:00");
+	        ordersInfoRepository.insert(new_info);
+	    }
+	    OrdersInfo info = ordersInfoRepository.findAll().getFirst();
+	    String createdAfter = info.getCreatedAfter();
+	    List<DiscogsOrder> orders_discogs = discogsClient.getDiscogsOrdersCreatedAfter(createdAfter);
+	    List<DatabaseOrder> dbOrders = orders_discogs.stream()
+	        .map(order -> {
+	            try {
+	                return orderMapper.mapToDatabaseOrder(order);
+	            } catch (IOException | InterruptedException e) {
+	                throw new RuntimeException("Error al convertir DiscogsOrder", e);
+	            }
+	        })
+	        .toList();
+	    saveOrdersAndUpdateInfo(dbOrders, info);
 	}
+
+	@Transactional(rollbackFor = Exception.class)
+	protected void saveOrdersAndUpdateInfo(List<DatabaseOrder> dbOrders, OrdersInfo oldInfo) {
+		orderRepository.saveAll(dbOrders);
+	    ordersInfoRepository.delete(oldInfo);    // elimina el OrdersInfo antiguo
+
+	    OrdersInfo new_info = new OrdersInfo();
+	    new_info.setCreatedAfter(getActualDate());
+	    ordersInfoRepository.insert(new_info);   // inserta el OrdersInfo nuevo
+	}
+
+
 
 	@Timed
 	public String getOrdersInformation() throws Exception {
@@ -166,26 +208,15 @@ public class OrderService {
 	// Other
 
 	private String getActualDate() {
-		ZoneOffset zonaHoraria = ZoneOffset.of("-08:00"); // UTC-8
+		ZoneOffset zonaHoraria = ZoneOffset.of("-07:00"); // UTC-7
 		OffsetDateTime horaActual = OffsetDateTime.now(zonaHoraria);
 		return horaActual.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 	}
 
-	// CONVERT
-
-	private DatabaseOrder convertDiscogsOrder(DiscogsOrder order) throws IOException, InterruptedException {
-		return orderMapper.mapToDatabaseOrder(order);
-	}
 
 	// CREATE
 
-	private DatabaseOrder createDatabaseOrder(DatabaseOrder order) {
-		return orderRepository.insert(order);
-	}
 
-	private DatabaseOrder createDatabaseOrderFromDiscogs(String id) throws IOException, InterruptedException {
-		return createDatabaseOrder(convertDiscogsOrder(getOrderFromDiscogs(id)));
-	}
 
 	public void checkUpdateOrder(DatabaseOrder orderDb) throws IOException, InterruptedException {
 		DiscogsOrder orderDisc = getOrderFromDiscogs(orderDb.getId());

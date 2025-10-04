@@ -1,5 +1,6 @@
 package dev.pablito.dots.mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import dev.pablito.dots.api.discogs.DiscogsClient;
 import dev.pablito.dots.api.discogs.DiscogsOrder;
 import dev.pablito.dots.api.discogs.DiscogsRelease;
+import dev.pablito.dots.entity.Artist;
 import dev.pablito.dots.entity.DatabaseOrder;
 import dev.pablito.dots.entity.MessageManager;
 import dev.pablito.dots.entity.DatabaseOrder.DatabaseItem;
@@ -37,8 +39,7 @@ public class OrderMapper {
         if (order == null) {
             return null;
         }
-        System.out.println(order.getId());
-
+        System.out.println("Mapping Discogs Order: " + order.getId() +  " to Database Order");
         DatabaseOrder dbOrder = new DatabaseOrder();
         dbOrder.setDiscogsId(order.getId());
         dbOrder.setType("Discogs");
@@ -46,7 +47,18 @@ public class OrderMapper {
         String numberStr = order.getId().replaceFirst(replace, "");
         dbOrder.setId("D" + numberStr);
         
-        dbOrder.setStatus(order.getStatus());
+        String statusDB = "Other";
+        String statusDS = order.getStatus();
+        if(statusDS.equals("Payment Pending") || statusDS.equals("Invoice Sent") 
+        		|| statusDS.equals("Payment Received") || statusDS.equals("In Progress")
+        		|| statusDS.equals("Shipped") || statusDS.equals("Cancelled (Non-Paying Buyer)")
+        		|| statusDS.equals("Cancelled (Item Unavailable)") 
+        		|| statusDS.equals("Cancelled (Per Buyer's Request)")) {
+        	statusDB = order.getStatus();
+        } 
+        
+        dbOrder.setStatus(statusDB);
+        
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy", Locale.ENGLISH);
         dbOrder.setCreated(ZonedDateTime.parse(order.getCreated()).format(formatter));
         dbOrder.setCreatedComplete(order.getCreated());
@@ -75,22 +87,26 @@ public class OrderMapper {
                     DatabaseOrder.DatabaseItem dbItem = new DatabaseOrder.DatabaseItem();
                     dbItem.setId(item.getId());
                     
-                    DatabaseRelease release;
+                    DatabaseRelease release = null;
                     
                     try {
                     	if(!releaseService.contains(item.getRelease().getId())) {
-                        	releaseService.putReleaseFromDiscogs(item.getRelease().getId());
+                    		DiscogsRelease discogsRelease = releaseService.getReleaseFromDiscogs(item.getRelease().getId());
+                    		if(discogsRelease != null) {
+                        		ReleaseMapper mapper = new ReleaseMapper();
+                        		releaseService.postRelease(mapper.mapToDatabaseRelease(discogsRelease));
+                    		}
+                    	} else {
+                    		release = releaseService.getRelease(item.getRelease().getId());
                     	}
-                    	
-                    	release = releaseService.getRelease(item.getRelease().getId());
                     	
 					} catch (IOException | InterruptedException e) {
 						release = null;
 						e.printStackTrace();
 					}
-                    dbItem.setName(release != null ? release.getTitle() : null);
-                    dbItem.setArtists(release != null ? release.getArtists() : null);
-                    dbItem.setThumb(release != null ? release.getThumb() : null);
+                    dbItem.setName(release != null ? release.getTitle() : "Undefined");
+                    dbItem.setArtists(release != null ? release.getArtists() : new ArrayList<Artist>());
+                    dbItem.setThumb(release != null ? release.getThumb() : "Undefined");
                     return dbItem;
                 })
                 .collect(Collectors.toList());
@@ -112,7 +128,6 @@ public class OrderMapper {
         
 
         // Set delivery_date if applicable
-        dbOrder.setDelivery_date("");  // Placeholder, set appropriately if needed
         dbOrder.setNotified(false);
         dbOrder.setNewMessagesCustomer(0); 
         dbOrder.setNewMessagesSeller(0);

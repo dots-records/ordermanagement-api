@@ -25,7 +25,7 @@ public class ProviderService {
 			provider = new DatabaseProvider(releaseId, "Stock", request.getPrice(), null, request.getUnits(), request.getCondition());
 			providerRepository.insert(provider);
 		} else if (request.getType().equals("Online")) {
-			provider = new DatabaseProvider(releaseId, "Online", request.getPrice(), request.getLink(), null, null);
+			provider = new DatabaseProvider(releaseId, "Online", request.getPrice(), request.getLink(), null, "M");
 			providerRepository.insert(provider);
 		}
 		

@@ -5,6 +5,8 @@ import java.time.Duration;
 import java.util.List;
 
 import dev.pablito.dots.aop.Timed;
+import dev.pablito.dots.api.discogs.DiscogsRelease;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.pablito.dots.entity.DatabaseOrder;
 import dev.pablito.dots.entity.DatabaseRelease;
 import dev.pablito.dots.entity.SearchRequest;
+import dev.pablito.dots.mapper.ReleaseMapper;
 import dev.pablito.dots.services.ReleaseService;
 
 @RestController
@@ -39,7 +42,13 @@ public class ReleaseController {
 	@PostMapping("/putReleaseFromDiscogs/{id}")
 	public void putReleaseFromDiscogs(@PathVariable Long id) throws IOException, InterruptedException {
 		try {
-			releaseService.putReleaseFromDiscogs(id);
+			if(!releaseService.contains(id)) {
+        		DiscogsRelease discogsRelease = releaseService.getReleaseFromDiscogs(id);
+        		if(discogsRelease != null) {
+            		ReleaseMapper mapper = new ReleaseMapper();
+            		releaseService.postRelease(mapper.mapToDatabaseRelease(discogsRelease));
+        		}
+        	} 
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] putReleaseFromDiscogs({})", id, e);
 		}

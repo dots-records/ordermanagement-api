@@ -26,11 +26,13 @@ public class ReleaseService {
 	private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
 	@Timed
-	public void putReleaseFromDiscogs(Long id) throws IOException, InterruptedException {
-		DiscogsRelease dsRelease = discogsClient.getRelease(id);
-		ReleaseMapper mapper = new ReleaseMapper();
-		DatabaseRelease dbRelease = mapper.mapToDatabaseRelease(dsRelease);
-		releaseRepository.insert(dbRelease);
+	public DiscogsRelease getReleaseFromDiscogs(Long id) throws IOException, InterruptedException {
+		return discogsClient.getRelease(id);
+	}
+	
+	@Timed
+	public void postRelease(DatabaseRelease release) {
+		releaseRepository.insert(release);
 	}
 
 	@Timed

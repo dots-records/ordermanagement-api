@@ -26,7 +26,6 @@ public class DatabaseOrder {
 	private Payment payment;
 	private Double revenue;
 	private Provider provider;
-	private String delivery_date;
 	private boolean notified;
 	private MessageManager messageManager;
 	private Integer newMessagesCustomer;
@@ -170,14 +169,6 @@ public class DatabaseOrder {
 
 	public void setProvider(Provider provider) {
 		this.provider = provider;
-	}
-
-	public String getDelivery_date() {
-		return delivery_date;
-	}
-
-	public void setDelivery_date(String delivery_date) {
-		this.delivery_date = delivery_date;
 	}
 
 	public String getId() {
