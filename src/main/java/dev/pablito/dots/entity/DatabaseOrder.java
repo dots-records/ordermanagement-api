@@ -31,6 +31,7 @@ public class DatabaseOrder {
 	private Integer newMessagesCustomer;
 	private Integer newMessagesSeller;
 	private Integer newMessagesDiscogs;
+	private boolean changed;
 	
 	
 	public static class Payment {
@@ -234,9 +235,17 @@ public class DatabaseOrder {
 	public void setCreatedComplete(String createdComplete) {
 		this.createdComplete = createdComplete;
 	}
-	
-	
 
+	public boolean isChanged() {
+		return changed;
+	}
+
+	public void setChanged(boolean changed) {
+		this.changed = changed;
+	}
+	
+	
+	
 	
 	
 	

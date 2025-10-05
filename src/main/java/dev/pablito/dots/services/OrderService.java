@@ -102,6 +102,7 @@ public class OrderService {
 		       		|| statusDS.equals("Cancelled (Per Buyer's Request)"))) {
 		    	statusDS = "Other";
 			} 
+		    
 		    if(!statusDS.equals(orderDB.getStatus())) {
 		    	updateOrdersDiscogs.add(orderDS);
 		    }
@@ -110,6 +111,7 @@ public class OrderService {
 	        .map(order -> {
 	            try {
 	                return orderMapper.mapToDatabaseOrder(order);
+	                
 	            } catch (IOException | InterruptedException e) {
 	                throw new RuntimeException("Error al convertir DiscogsOrder", e);
 	            }

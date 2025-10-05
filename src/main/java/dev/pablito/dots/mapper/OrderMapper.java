@@ -112,6 +112,7 @@ public class OrderMapper {
                 .collect(Collectors.toList());
         dbOrder.setItems(dbItems);
                 
+        dbOrder.setChanged(true);
         /*
         List<DatabaseOrder.DatabaseItem> dbItems = order.getItems().stream()
                 .map(item -> {
