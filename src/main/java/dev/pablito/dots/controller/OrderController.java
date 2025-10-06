@@ -27,7 +27,45 @@ public class OrderController {
 	
 	
 	private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
+	
+	// Gets order identified by id from database "Orders"
+	@Timed
+	@GetMapping("/orders/{id}")
+	public ResponseEntity<DatabaseOrder>getOrder(@PathVariable String id) throws IOException, InterruptedException {
+        try {
+        	DatabaseOrder response = orderService.getOrder(id);
+            return new ResponseEntity<DatabaseOrder>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("[TASK ERROR] getOrder({})", id, e);
+            return ResponseEntity.noContent().build();
+        }
+	}
 		
+	
+	@Timed
+	@GetMapping("/orders")
+	public ResponseEntity<Page<DatabaseOrder>>getOrders(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "50") int size,
+			@RequestParam(required = false) Boolean archived)  {
+        try {
+        	Page<DatabaseOrder> response;
+        	if(archived == null) {
+        		response = orderService.getOrders(page, size);
+        	} else {
+        		response = orderService.getOrders(page, size, archived);
+        	}
+            return new ResponseEntity<Page<DatabaseOrder>>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("[TASK ERROR] getOrders({}, {}, {}) ", page, size, archived, e);
+            return ResponseEntity.noContent().build();
+        }
+		
+	}
+	
+	
+	
+	// ***POR HACER**
 	// Gets orders which status = {Payment Received, Invoice Sent, Payment Pending} and archived = false from database "Orders"
 	@Timed
 	@GetMapping("/getUnarchivedNewOrders")
@@ -42,57 +80,7 @@ public class OrderController {
 		
 	}
 	
-	// Gets orders which archived = false from database "Orders"
-	@Timed
-	@GetMapping("/getUnarchivedOrders/page={page}&size={size}")
-	public ResponseEntity<Page<DatabaseOrder>>getUnarchivedOrders(@PathVariable int page, @PathVariable int size) {		
-        try {
-        	Page<DatabaseOrder> response = orderService.getUnarchivedOrders(page, size);
-            return new ResponseEntity<Page<DatabaseOrder>>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            logger.error("[TASK ERROR] getUnarchivedOrders({}, {})", page, size, e);
-            return ResponseEntity.noContent().build();
-        }
-	}  
 	
-	// Gets orders which archived = true from database "Orders"
-	@Timed
-	@GetMapping("/getArchivedOrders/page={page}&size={size}")
-	public ResponseEntity<Page<DatabaseOrder>>getArchivedOrders(@PathVariable int page, @PathVariable int size) {
-        try {
-        	Page<DatabaseOrder> response = orderService.getArchivedOrders(page, size);
-            return new ResponseEntity<Page<DatabaseOrder>>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            logger.error("[TASK ERROR] getArchivedOrders({}, {})", page, size, e);
-            return ResponseEntity.noContent().build();
-        }
-	}
-	
-	// Gets all orders from database "Orders"
-	@Timed
-	@GetMapping("/getAllOrders/page={page}&size={size}")
-	public ResponseEntity<Page<DatabaseOrder>>getAllOrders(@PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
-        try {
-        	Page<DatabaseOrder> response = orderService.getAllOrders(page, size);
-            return new ResponseEntity<Page<DatabaseOrder>>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            logger.error("[TASK ERROR] getAllOrders({}, {})", page, size, e);
-            return ResponseEntity.noContent().build();
-        }
-	}
-	
-	// Gets order identified by id from database "Orders"
-	@Timed
-	@GetMapping("/getOrder/{id}")
-	public ResponseEntity<DatabaseOrder>getOrder(@PathVariable String id) throws IOException, InterruptedException {
-        try {
-        	DatabaseOrder response = orderService.getOrder(id);
-            return new ResponseEntity<DatabaseOrder>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            logger.error("[TASK ERROR] getOrder({})", id, e);
-            return ResponseEntity.noContent().build();
-        }
-	}
 	
 	// TODO: Hacer que devuelva algo
 	// Updates status of order identified by id in database "Orders" and Discogs to newStatus 

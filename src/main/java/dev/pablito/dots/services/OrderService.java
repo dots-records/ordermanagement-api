@@ -43,6 +43,27 @@ public class OrderService {
 
 	// Function: Get orders from Database
 
+	
+	@Timed
+	public DatabaseOrder getOrder(String id) throws IOException, InterruptedException {
+		return orderRepository.findOrderById(id).get();
+	}
+	
+	@Timed
+	public Page<DatabaseOrder> getOrders(int page, int size) throws IOException, InterruptedException {
+		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
+		Page<DatabaseOrder> orderPage = orderRepository.findAll(pageable);
+		return orderPage;
+	}
+
+	@Timed
+	public Page<DatabaseOrder> getOrders(int page, int size, boolean archived) throws IOException, InterruptedException {
+		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
+		Page<DatabaseOrder> orderPage = orderRepository.findByArchived(archived, pageable);
+		return orderPage;
+	}
+	
+	
 	@Timed
 	public List<DatabaseOrder> getUnarchivedNewOrders() throws IOException, InterruptedException {
 		// Crear una lista que contenga los pedidos con "archived = false" y el estado
@@ -73,15 +94,9 @@ public class OrderService {
 
 	@Timed
 	public Page<DatabaseOrder> getAllOrders(int page, int size) throws IOException, InterruptedException {
-		List<DatabaseOrder> orders = new ArrayList<>();
 		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
 		Page<DatabaseOrder> orderPage = orderRepository.findAll(pageable);
 		return orderPage;
-	}
-
-	@Timed
-	public DatabaseOrder getOrder(String id) throws IOException, InterruptedException {
-		return orderRepository.findOrderById(id).get();
 	}
 
 	@Timed
