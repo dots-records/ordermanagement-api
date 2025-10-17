@@ -31,17 +31,16 @@ public class MeasurementAspect {
         else return "";
     }
 
-    private String getArguments (ProceedingJoinPoint joinPoint) {
-        if (joinPoint.getArgs() == null)
-            return "";
-
-        String arguments = "";
+    private String getArguments(ProceedingJoinPoint joinPoint) {
         Object[] signatureArgs = joinPoint.getArgs();
-        for (Object signatureArg : signatureArgs) {
-            arguments += signatureArg.toString() + " ";
-        }
+        if (signatureArgs == null || signatureArgs.length == 0) return "";
 
-        return arguments.trim();
+        StringBuilder arguments = new StringBuilder();
+        for (Object signatureArg : signatureArgs) {
+            // Manejo seguro de null
+            arguments.append(signatureArg != null ? signatureArg.toString() : "null").append(" ");
+        }
+        return arguments.toString().trim();
     }
 
     /*

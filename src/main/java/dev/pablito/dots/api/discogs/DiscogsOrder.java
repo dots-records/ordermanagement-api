@@ -24,6 +24,7 @@ public class DiscogsOrder {
 	private Double calculated_fee;
 	private Double revenue;
 	private List<Item> items;
+	private String uri;
 	
 	public static class Price {
 		private String currency;
@@ -219,9 +220,18 @@ public class DiscogsOrder {
 	public void setItems(List<Item> items) {
 		this.items = items;
 	}
+	
+	
+	public String getUri() {
+		return uri;
+	}
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
 	@Override
 	public String toString() {
 		return "Order [id=" + id + ", status=" + status + ", next_status=" + next_status + ", created=" + created + "]";
 	}
+	
 	
 }

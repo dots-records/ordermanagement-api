@@ -32,6 +32,7 @@ public class DatabaseOrder {
 	private Integer newMessagesSeller;
 	private Integer newMessagesDiscogs;
 	private boolean changed;
+	private String uri;
 	
 	
 	public static class Payment {
@@ -242,6 +243,14 @@ public class DatabaseOrder {
 
 	public void setChanged(boolean changed) {
 		this.changed = changed;
+	}
+
+	public String getUri() {
+		return uri;
+	}
+
+	public void setUri(String uri) {
+		this.uri = uri;
 	}
 	
 	

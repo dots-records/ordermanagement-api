@@ -57,47 +57,31 @@ public class OrderService {
 	}
 
 	@Timed
-	public Page<DatabaseOrder> getOrders(int page, int size, boolean archived) throws IOException, InterruptedException {
+	public Page<DatabaseOrder> getOrdersByArchived(int page, int size, boolean archived) throws IOException, InterruptedException {
 		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
 		Page<DatabaseOrder> orderPage = orderRepository.findByArchived(archived, pageable);
 		return orderPage;
 	}
 	
+	@Timed
+	public Page<DatabaseOrder> searchOrders(String palabra, int page, int size) {
+		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
+		return orderRepository.findBySearchTerm(palabra, pageable);
+	}
 	
 	@Timed
-	public List<DatabaseOrder> getUnarchivedNewOrders() throws IOException, InterruptedException {
-		// Crear una lista que contenga los pedidos con "archived = false" y el estado
-		// deseado
-		List<DatabaseOrder> orders = new ArrayList<>();
-		orders.addAll(orderRepository.findByStatusAndArchived("Payment Received", false));
-		orders.addAll(orderRepository.findByStatusAndArchived("Invoice Sent", false));
-		orders.addAll(orderRepository.findByStatusAndArchived("Payment Pending", false));
-		
-		return orders;
+	public Page<DatabaseOrder> searchOrdersByArchived(String palabra, int page, int size, boolean archived) {
+		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
+		return orderRepository.findByArchivedAndSearchTerm(archived, palabra, pageable);
 	}
 
-	@Timed
-	public Page<DatabaseOrder> getUnarchivedOrders(int page, int size) throws IOException, InterruptedException {
-		List<DatabaseOrder> orders = new ArrayList<>();
-		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
-		Page<DatabaseOrder> orderPage = orderRepository.findByArchived(false, pageable);
-		return orderPage;
-	}
+	
 
-	@Timed
-	public Page<DatabaseOrder> getArchivedOrders(int page, int size) throws IOException, InterruptedException {
-		List<DatabaseOrder> orders = new ArrayList<>();
-		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
-		Page<DatabaseOrder> orderPage = orderRepository.findByArchived(true, pageable);
-		return orderPage;
-	}
+	
 
-	@Timed
-	public Page<DatabaseOrder> getAllOrders(int page, int size) throws IOException, InterruptedException {
-		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
-		Page<DatabaseOrder> orderPage = orderRepository.findAll(pageable);
-		return orderPage;
-	}
+	
+
+	
 
 	@Timed
 	public void updateUpdatableDiscogsOrders() throws Exception {
@@ -180,21 +164,7 @@ public class OrderService {
 			OrdersInfo info = ordersInfoRepository.findAll().getFirst();
 			return info.getCreatedAfter();
 	}
-	@Timed
-	public Page<DatabaseOrder> searchOrdersByArchived(String palabra, int page, int size, boolean archived) {
-		// Crear el Pageable con la página y el tamaño, puedes agregar un orden si lo
-		// necesitas
-		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
-		return orderRepository.findByArchivedAndSearchTerm(archived, palabra, pageable);
-	}
-
-	@Timed
-	public Page<DatabaseOrder> searchOrders(String palabra, int page, int size) {
-		// Crear el Pageable con la página y el tamaño, puedes agregar un orden si lo
-		// necesitas
-		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
-		return orderRepository.findBySearchTerm(palabra, pageable);
-	}
+	
 
 	// From Discogs
 	@Timed
@@ -211,16 +181,7 @@ public class OrderService {
 		return discogsClient.getDiscogsMessages(id).getMessages();
 	}
 
-	// From Database
-
-	@Timed
-	public String createListings() throws IOException, InterruptedException {
-		ArrayList<Long> listings = new ArrayList<>();
-
-		discogsClient.createMarketplaceListing(32366235, 55.49, "Brand new. Never played. Ships on February");
-
-		return "Todo ok";
-	}
+	
 
 	// Other
 
@@ -262,11 +223,6 @@ public class OrderService {
 			return orderRepository.save(order);
 		});
 	}
-
-	// TODO: Revisar que funcione bien
-	// TODO: Los mensajes no se estan añadiendo en order, hacer que los mensajes se
-	// ordenen por fecha despues a la hora de hacer
-	// el get de MongoDb
 
 	@Timed
 	public DiscogsOrder updateOrderStatusInDiscogs(String id, String new_status)

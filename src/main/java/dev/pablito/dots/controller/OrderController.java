@@ -41,49 +41,47 @@ public class OrderController {
         }
 	}
 		
-	
 	@Timed
 	@GetMapping("/orders")
 	public ResponseEntity<Page<DatabaseOrder>>getOrders(
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "50") int size,
-			@RequestParam(required = false) Boolean archived)  {
+			@RequestParam(required = false) Boolean archived,
+			@RequestParam(required = false) String search)  {
         try {
         	Page<DatabaseOrder> response;
-        	if(archived == null) {
-        		response = orderService.getOrders(page, size);
+        	if(search == null) {
+        		if(archived == null) {
+            		response = orderService.getOrders(page, size);
+            	} else {
+            		response = orderService.getOrdersByArchived(page, size, archived);
+            	}
         	} else {
-        		response = orderService.getOrders(page, size, archived);
+        		if(archived == null) {
+            		response = orderService.searchOrders(search, page, size);
+            	} else {
+            		response = orderService.searchOrdersByArchived(search, page, size, archived);
+            	}
         	}
+        	
             return new ResponseEntity<Page<DatabaseOrder>>(response, HttpStatus.OK);
         } catch (Exception e) {
-            logger.error("[TASK ERROR] getOrders({}, {}, {}) ", page, size, archived, e);
+            logger.error("[TASK ERROR] getOrders({}, {}, {}, {}) ", page, size, archived, search, e);
             return ResponseEntity.noContent().build();
-        }
-		
+        }		
 	}
 	
-	
-	
-	// ***POR HACER**
-	// Gets orders which status = {Payment Received, Invoice Sent, Payment Pending} and archived = false from database "Orders"
 	@Timed
-	@GetMapping("/getUnarchivedNewOrders")
-	public ResponseEntity<List<DatabaseOrder>>getUnarchivedNewOrders()  {
+	@PutMapping("/orders/{id}/{status}")
+	public void putOrderStatus(@PathVariable String id, @PathVariable String status) {
         try {
-        	List<DatabaseOrder> response = orderService.getUnarchivedNewOrders();
-            return new ResponseEntity<List<DatabaseOrder>>(response, HttpStatus.OK);
+        	//orderService.updateOrderStatusInDiscogs(id, newStatus);
+    		orderService.updateOrderStatusInDatabase(id, status);
         } catch (Exception e) {
-            logger.error("[TASK ERROR] getUnarchivedNewOrders() ", e);
-            return ResponseEntity.noContent().build();
+            logger.error("[TASK ERROR] putOrderStatus({}, {})", id, status, e);
         }
-		
 	}
 	
-	
-	
-	// TODO: Hacer que devuelva algo
-	// Updates status of order identified by id in database "Orders" and Discogs to newStatus 
 	@Timed
 	@PostMapping("/updateStatusOrder/{id}/{newStatus}")
 	public void updateStatusOrder(@PathVariable String id, @PathVariable String newStatus) {
@@ -93,30 +91,6 @@ public class OrderController {
         } catch (Exception e) {
             logger.error("[TASK ERROR] updateStatusOrder({}, {})", id, newStatus, e);
         }
-	}
-	
-	// TODO: Falta poner el log
-	// Search orders which archived = false in database "Orders"
-	@PostMapping("/searchUnarchivedOrders/page={page}&size={size}")
-	@Timed
-	public ResponseEntity<Page<DatabaseOrder>>searchUnarchivedOrders(@RequestBody SearchRequest request, @PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
-		logger.info(request.getSearch());
-		return new ResponseEntity<Page<DatabaseOrder>>(orderService.searchOrdersByArchived(request.getSearch(), page, size, false), HttpStatus.OK);
-	}
-	
-	// Search orders which archived = true in database "Orders"
-	@Timed
-	@PostMapping("/searchArchivedOrders/page={page}&size={size}")
-	public ResponseEntity<Page<DatabaseOrder>>searchArchivedOrders(@RequestBody SearchRequest request, @PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
-		return new ResponseEntity<Page<DatabaseOrder>>(orderService.searchOrdersByArchived(request.getSearch(), page, size, true), HttpStatus.OK);
-	}
-	
-	// Search orders in database "Orders"
-	@Timed
-	@PostMapping("/searchAllOrders/page={page}&size={size}")
-	public ResponseEntity<Page<DatabaseOrder>>searchAllOrders(@RequestBody SearchRequest request, @PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
-		logger.info(request.getSearch());
-		return new ResponseEntity<Page<DatabaseOrder>>(orderService.searchOrders(request.getSearch(), page, size), HttpStatus.OK);
 	}
 	
 	@Timed

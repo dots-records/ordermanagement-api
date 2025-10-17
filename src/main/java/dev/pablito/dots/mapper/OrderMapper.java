@@ -44,6 +44,7 @@ public class OrderMapper {
         dbOrder.setDiscogsId(order.getId());
         dbOrder.setType("Discogs");
         String replace = "^" + sellerId +"-";
+        
         String numberStr = order.getId().replaceFirst(replace, "");
         dbOrder.setId("D" + numberStr);
         
@@ -94,7 +95,9 @@ public class OrderMapper {
                     		DiscogsRelease discogsRelease = releaseService.getReleaseFromDiscogs(item.getRelease().getId());
                     		if(discogsRelease != null) {
                         		ReleaseMapper mapper = new ReleaseMapper();
-                        		releaseService.postRelease(mapper.mapToDatabaseRelease(discogsRelease));
+                        		release = mapper.mapToDatabaseRelease(discogsRelease);
+                        		releaseService.postRelease(release);
+                        		
                     		}
                     	} else {
                     		release = releaseService.getRelease(item.getRelease().getId());
@@ -135,6 +138,7 @@ public class OrderMapper {
         dbOrder.setNewMessagesDiscogs(0);
         MessageManager messageManager = new MessageManager();
         dbOrder.setMessageManager(messageManager);
+        dbOrder.setUri(order.getUri());;
 
         return dbOrder;
     }
