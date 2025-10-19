@@ -71,6 +71,8 @@ public class OrderController {
         }		
 	}
 	
+	
+	// MIRAR EL PATCH
 	@Timed
 	@PutMapping("/orders/{id}/{status}")
 	public void putOrderStatus(@PathVariable String id, @PathVariable String status) {
@@ -81,6 +83,21 @@ public class OrderController {
             logger.error("[TASK ERROR] putOrderStatus({}, {})", id, status, e);
         }
 	}
+	
+	/*Mirar @PatchMapping("/orders/{id}/status")
+public ResponseEntity<Void> patchOrderStatus(
+        @PathVariable String id,
+        @RequestBody Map<String, String> body) {
+    try {
+        String status = body.get("status");
+        orderService.updateOrderStatusInDatabase(id, status);
+        return ResponseEntity.noContent().build();
+    } catch (Exception e) {
+        logger.error("[TASK ERROR] patchOrderStatus({}, body={})", id, body, e);
+        return ResponseEntity.internalServerError().build();
+    }
+}
+*/
 	
 	@Timed
 	@PostMapping("/updateStatusOrder/{id}/{newStatus}")
