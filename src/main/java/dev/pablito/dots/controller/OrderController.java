@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -71,43 +72,21 @@ public class OrderController {
         }		
 	}
 	
-	
-	// MIRAR EL PATCH
 	@Timed
-	@PutMapping("/orders/{id}/{status}")
-	public void putOrderStatus(@PathVariable String id, @PathVariable String status) {
-        try {
-        	//orderService.updateOrderStatusInDiscogs(id, newStatus);
-    		orderService.updateOrderStatusInDatabase(id, status);
-        } catch (Exception e) {
-            logger.error("[TASK ERROR] putOrderStatus({}, {})", id, status, e);
-        }
-	}
-	
-	/*Mirar @PatchMapping("/orders/{id}/status")
-public ResponseEntity<Void> patchOrderStatus(
+	@PatchMapping("/orders/{id}/status")
+	public ResponseEntity<Void> patchOrderStatus(
         @PathVariable String id,
         @RequestBody Map<String, String> body) {
-    try {
-        String status = body.get("status");
-        orderService.updateOrderStatusInDatabase(id, status);
-        return ResponseEntity.noContent().build();
-    } catch (Exception e) {
-        logger.error("[TASK ERROR] patchOrderStatus({}, body={})", id, body, e);
-        return ResponseEntity.internalServerError().build();
-    }
-}
-*/
-	
-	@Timed
-	@PostMapping("/updateStatusOrder/{id}/{newStatus}")
-	public void updateStatusOrder(@PathVariable String id, @PathVariable String newStatus) {
-        try {
-        	//orderService.updateOrderStatusInDiscogs(id, newStatus);
-    		orderService.updateOrderStatusInDatabase(id, newStatus);
-        } catch (Exception e) {
-            logger.error("[TASK ERROR] updateStatusOrder({}, {})", id, newStatus, e);
-        }
+	    try {
+	        String status = body.get("status");
+	        orderService.updateOrderStatusInDatabase(id, status);
+	        DatabaseOrder dbOrder = orderService.getOrder(id);
+	        orderService.updateOrderStatusInDiscogs(dbOrder.getDiscogsId(), status);
+	        return ResponseEntity.noContent().build();
+	    } catch (Exception e) {
+	        logger.error("[TASK ERROR] patchOrderStatus({}, body={})", id, body, e);
+	        return ResponseEntity.internalServerError().build();
+	    }
 	}
 	
 	@Timed

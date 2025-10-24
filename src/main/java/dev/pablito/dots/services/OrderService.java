@@ -75,13 +75,22 @@ public class OrderService {
 		return orderRepository.findByArchivedAndSearchTerm(archived, palabra, pageable);
 	}
 
-	
+	@Timed
+	public Optional<DatabaseOrder> updateOrderStatusInDatabase(String id, String new_status) {
+		return orderRepository.findById(id).map(order -> {
+			// Actualizar el estado del pedido
+			order.setStatus(new_status);
+			// Guardar el documento actualizado
+			return orderRepository.save(order);
+		});
+	}
 
-	
-
-	
-
-	
+	@Timed
+	public DiscogsOrder updateOrderStatusInDiscogs(String id, String new_status)
+			throws IOException, InterruptedException {
+		return discogsClient.updateOrderStatus(id, new_status);
+	}
+		
 
 	@Timed
 	public void updateUpdatableDiscogsOrders() throws Exception {
@@ -213,21 +222,6 @@ public class OrderService {
 	}
 
 	// UPDATE
-
-	@Timed
-	public Optional<DatabaseOrder> updateOrderStatusInDatabase(String id, String new_status) {
-		return orderRepository.findById(id).map(order -> {
-			// Actualizar el estado del pedido
-			order.setStatus(new_status);
-			// Guardar el documento actualizado
-			return orderRepository.save(order);
-		});
-	}
-
-	@Timed
-	public DiscogsOrder updateOrderStatusInDiscogs(String id, String new_status)
-			throws IOException, InterruptedException {
-		return discogsClient.updateOrderStatus(id, new_status);
-	}
+	
 
 }
