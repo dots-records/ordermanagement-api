@@ -90,6 +90,15 @@ public class OrderService {
 			throws IOException, InterruptedException {
 		return discogsClient.updateOrderStatus(id, new_status);
 	}
+	
+	@Timed
+	public Optional<DatabaseOrder> updateOrderChanged(String id, Boolean changed) {
+		return orderRepository.findById(id).map(order -> {
+			// Actualizar el estado del pedido
+			order.setChanged(changed);		
+			return orderRepository.save(order);
+		});
+	}
 		
 
 	@Timed

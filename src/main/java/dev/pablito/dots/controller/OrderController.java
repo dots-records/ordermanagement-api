@@ -90,6 +90,30 @@ public class OrderController {
 	}
 	
 	@Timed
+	@PatchMapping("/orders/{id}/changed")
+	public ResponseEntity<Void> patchOrderChanged(
+	        @PathVariable String id,
+	        @RequestBody Map<String, String> body) {
+	    try {
+	        String changedStr = body.get("changed");
+
+	        if (changedStr == null || 
+	            (!changedStr.equalsIgnoreCase("true") && !changedStr.equalsIgnoreCase("false"))) {
+	            return ResponseEntity
+	                    .badRequest()
+	                    .body(null);
+	        }
+	        boolean changed = Boolean.parseBoolean(changedStr);
+	        orderService.updateOrderChanged(id, changed);
+	        return ResponseEntity.noContent().build();
+	    } catch (Exception e) {
+	        logger.error("[TASK ERROR] patchOrderChanged({}, body={})", id, body, e);
+	        return ResponseEntity.internalServerError().build();
+	    }
+	}
+
+	
+	@Timed
 	@GetMapping("/getOrdersInformation")
 	public ResponseEntity<String>getOrdersInformation() throws Exception {
 		return new ResponseEntity<String>(orderService.getOrdersInformation(), HttpStatus.OK);
