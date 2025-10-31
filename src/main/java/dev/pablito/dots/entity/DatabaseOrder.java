@@ -33,49 +33,67 @@ public class DatabaseOrder {
 	private Integer newMessagesDiscogs;
 	private boolean changed;
 	private String uri;
-	
-	
+
 	public static class Payment {
 		private Double shipping;
 		private Double items;
+
 		public Double getShipping() {
 			return shipping;
 		}
+
 		public void setShipping(Double shipping) {
 			this.shipping = shipping;
 		}
+
 		public Double getItems() {
 			return items;
 		}
+
 		public void setItems(Double items) {
 			this.items = items;
 		}
 	}
-	
+
 	public static class DatabaseItem {
 		private Long id;
+		private Long releaseId;
 		private String name;
 		private List<Artist> artists;
 		private String thumb;
-		
+
 		public Long getId() {
 			return id;
 		}
+
 		public void setId(Long id) {
 			this.id = id;
 		}
+
+		public Long getReleaseId() {
+			return releaseId;
+		}
+
+		public void setReleaseId(Long releaseId) {
+			this.releaseId = releaseId;
+		}
+
 		public String getName() {
 			return name;
 		}
+
 		public void setName(String name) {
 			this.name = name;
 		}
+
 		public List<Artist> getArtists() {
 			return artists;
 		}
+
 		public void setArtists(List<Artist> artists) {
 			this.artists = artists;
 		}
+
 		public String getThumb() {
 			return thumb;
 		}
@@ -83,27 +101,34 @@ public class DatabaseOrder {
 		public void setThumb(String thumb) {
 			this.thumb = thumb;
 		}
+
 	}
-	
+
 	public static class Provider {
 		private String name;
 		private String information;
 		private Integer price;
+
 		public String getName() {
 			return name;
 		}
+
 		public void setName(String name) {
 			this.name = name;
 		}
+
 		public String getInformation() {
 			return information;
 		}
+
 		public void setInformation(String information) {
 			this.information = information;
 		}
+
 		public Integer getPrice() {
 			return price;
 		}
+
 		public void setPrice(Integer price) {
 			this.price = price;
 		}
@@ -252,12 +277,5 @@ public class DatabaseOrder {
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
 }

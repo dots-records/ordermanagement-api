@@ -110,6 +110,7 @@ public class OrderMapper {
                     dbItem.setName(release != null ? release.getTitle() : "Undefined");
                     dbItem.setArtists(release != null ? release.getArtists() : new ArrayList<Artist>());
                     dbItem.setThumb(release != null ? release.getThumb() : "Undefined");
+                    dbItem.setReleaseId(release != null ? release.getId() : null);
                     return dbItem;
                 })
                 .collect(Collectors.toList());
