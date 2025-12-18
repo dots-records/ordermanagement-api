@@ -21,11 +21,13 @@ public class ProviderService {
 	@Timed
 	public void createProvider(long releaseId, ProviderRequest request) throws IOException, InterruptedException {
 		DatabaseProvider provider;
-		if(request.getType().equals("Stock")) {
-			provider = new DatabaseProvider(releaseId, "Stock", request.getPrice(), null, request.getUnits(), request.getCondition());
+		if(request.getType().equals("In Stock")) {
+			provider = new DatabaseProvider(releaseId, "In Stock", request.getPrice(), null,
+					request.getUnits(), request.getCondition(), request.getDescription());
 			providerRepository.insert(provider);
 		} else if (request.getType().equals("Online")) {
-			provider = new DatabaseProvider(releaseId, "Online", request.getPrice(), request.getLink(), null, "M");
+			provider = new DatabaseProvider(releaseId, "Online", request.getPrice(), request.getLink(), 
+					null, request.getCondition(), request.getDescription());
 			providerRepository.insert(provider);
 		}
 		

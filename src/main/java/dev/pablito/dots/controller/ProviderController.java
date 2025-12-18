@@ -34,7 +34,7 @@ public class ProviderController {
 	private static final Logger logger = LoggerFactory.getLogger(ProviderController.class);
 
 	@Timed
-	@PostMapping("/createProvider/releaseId={releaseId}")
+	@PostMapping("/releases/{releaseId}/providers")
 	public void createProvider(@PathVariable Long releaseId, @RequestBody ProviderRequest request)
 			throws IOException, InterruptedException {
 		try {
@@ -45,7 +45,7 @@ public class ProviderController {
 	}
 	
 	@Timed
-	@GetMapping("/getProviders/releaseId={releaseId}")
+	@GetMapping("/releases/{releaseId}/providers")
 	public ResponseEntity<List<DatabaseProvider>>getProviders(@PathVariable Long releaseId) throws IOException, InterruptedException {
         try {
         	List<DatabaseProvider> response = providerService.getProviders(releaseId);

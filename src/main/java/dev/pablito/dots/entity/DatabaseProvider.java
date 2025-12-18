@@ -1,5 +1,6 @@
 package dev.pablito.dots.entity;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -17,9 +18,11 @@ public class DatabaseProvider {
 	private String link;
 	private Integer units;
 	private String condition;
+	private String description;
 	
 	
-	public DatabaseProvider(Long releaseId, String type, Double price, String link, Integer units, String condition) {
+	public DatabaseProvider(Long releaseId, String type, Double price, String link, Integer units, String condition,
+			String description) {
 		super();
 		this.releaseId = releaseId;
 		this.type = type;
@@ -27,6 +30,7 @@ public class DatabaseProvider {
 		this.link = link;
 		this.units = units;
 		this.condition = condition;
+		this.description = description;
 	}
 	
 	
@@ -73,6 +77,19 @@ public class DatabaseProvider {
 	public void setCondition(String condition) {
 		this.condition = condition;
 	}
+
+
+
+	public String getDescription() {
+		return description;
+	}
+
+
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	
 	
 	

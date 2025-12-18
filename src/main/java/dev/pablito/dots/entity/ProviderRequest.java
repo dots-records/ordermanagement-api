@@ -6,6 +6,7 @@ public class ProviderRequest {
 	private String link;
 	private int units;
 	private String condition;
+	private String description;
 	
 	public String getType() {
 		return type;
@@ -37,6 +38,13 @@ public class ProviderRequest {
 	public void setCondition(String condition) {
 		this.condition = condition;
 	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	
 	
 	
