@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,5 +57,38 @@ public class ProviderController {
             return ResponseEntity.noContent().build();
         }
 	}
+	
+	@Timed
+	@PutMapping("/releases/{releaseId}/providers/{providerId}")
+	public ResponseEntity<Void> updateProvider(
+	        @PathVariable Long releaseId,
+	        @PathVariable String providerId,
+	        @RequestBody ProviderRequest request) {
+	    try {
+	        providerService.updateProvider(releaseId, providerId, request);
+	        return ResponseEntity.ok().build();
+	    } catch (Exception e) {
+	        logger.error(
+	            "[TASK ERROR] updateProvider({}, {}, {})",
+	            releaseId, providerId, request, e
+	        );
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
+	
+	@Timed
+	@DeleteMapping("/releases/{releaseId}/providers/{providerId}")
+	public ResponseEntity<Void> deleteProvider(
+	        @PathVariable Long releaseId,
+	        @PathVariable String providerId) {
+	    try {
+	        providerService.deleteProvider(releaseId, providerId);
+	        return ResponseEntity.ok().build();
+	    } catch (Exception e) {
+	        logger.error("[TASK ERROR] deleteProvider({}, {})", releaseId, providerId, e);
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
+
 
 }

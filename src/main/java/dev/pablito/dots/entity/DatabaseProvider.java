@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DatabaseProvider {
+	@Id
+    private String id;
 	private Long releaseId;
 	private String type;
 	private Double price;
@@ -89,6 +91,20 @@ public class DatabaseProvider {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+
+
+	public String getId() {
+		return id;
+	}
+
+
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	
 	
 	
 	

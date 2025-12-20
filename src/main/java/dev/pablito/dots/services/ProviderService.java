@@ -37,5 +37,37 @@ public class ProviderService {
 	public List<DatabaseProvider> getProviders(long releaseId) throws IOException, InterruptedException {
 		return providerRepository.findByReleaseId(releaseId);
 	}
+	
+	public void updateProvider(Long releaseId, String providerId, ProviderRequest request) {
+		
+	    DatabaseProvider provider = providerRepository
+	        .findByIdAndReleaseId(providerId, releaseId)
+	        .orElseThrow(() -> new RuntimeException("Provider not found"));
+	       
+
+	    provider.setType(request.getType());
+	    provider.setPrice(request.getPrice());
+	    provider.setCondition(request.getCondition());
+	    provider.setDescription(request.getDescription());
+
+	    if ("In Stock".equals(request.getType())) {
+	        provider.setUnits(request.getUnits());
+	        provider.setLink(null);
+	    } else {
+	        provider.setLink(request.getLink());
+	        provider.setUnits(null);
+	    }
+
+	    providerRepository.save(provider);
+	}
+
+	public void deleteProvider(Long releaseId, String providerId) {
+	    DatabaseProvider provider = providerRepository
+	        .findByIdAndReleaseId(providerId, releaseId)
+	        .orElseThrow(() -> new RuntimeException("Provider not found"));
+
+	    providerRepository.delete(provider);
+	}
+
 
 }
