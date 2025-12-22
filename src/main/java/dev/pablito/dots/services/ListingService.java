@@ -22,8 +22,8 @@ public class ListingService {
 	private ListingRepository listingRepository;
 	
 	@Timed
-	public void createListing(long releaseId) throws IOException, InterruptedException {
-		DatabaseListing listing = new DatabaseListing(releaseId, "Vinted", "hola.com", 1.4);
+	public void createListing(long releaseId, ListingRequest request) throws IOException, InterruptedException {
+		DatabaseListing listing = new DatabaseListing(releaseId, request.getPlatform(), request.getLink(), request.getSellingPrice());
 		listingRepository.insert(listing);
 	}
 	

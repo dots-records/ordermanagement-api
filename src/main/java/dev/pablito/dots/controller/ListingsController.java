@@ -21,6 +21,7 @@ import dev.pablito.dots.aop.Timed;
 import dev.pablito.dots.entity.DatabaseOrder;
 import dev.pablito.dots.entity.DatabaseListing;
 import dev.pablito.dots.entity.ListingRequest;
+import dev.pablito.dots.entity.ProviderRequest;
 import dev.pablito.dots.services.ListingService;
 
 @RestController
@@ -32,19 +33,25 @@ public class ListingsController {
 
 	private static final Logger logger = LoggerFactory.getLogger(ListingsController.class);
 
+	//La idea es poder poner los de vinted y wallapop y para los de discogs dar la opcion de crear el listing en la pagina 
+	// web o poner un link ya creado, mirar algo para el precio de los listings de discogs, se debe tambien ver el 
+	//stock asociado, con las ganancias correspondientes. Mirar algo para que se autochecken los discogs y poner un apartado 
+	// en revision.
+	// El inventory de discogs debe ser igual a los listings de discogs de mongo Db.
+	
 	@Timed
-	@PostMapping("/createListing/releaseId={releaseId}")
-	public void createListing(@PathVariable Long releaseId)
+	@PostMapping("/releases/{releaseId}/listings")
+	public void createListing(@PathVariable Long releaseId, @RequestBody ListingRequest request)
 			throws IOException, InterruptedException {
 		try {
-			listingService.createListing(releaseId);
+			listingService.createListing(releaseId, request);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] createListing({})", releaseId, e);
 		}
 	}
 	
 	@Timed
-	@GetMapping("/getListings/releaseId={releaseId}")
+	@GetMapping("/releases/{releaseId}/listings")
 	public ResponseEntity<List<DatabaseListing>>getListings(@PathVariable Long releaseId) throws IOException, InterruptedException {
         try {
         	List<DatabaseListing> response = listingService.getListings(releaseId);

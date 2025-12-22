@@ -142,36 +142,7 @@ public class DiscogsClient {
 	}
 	
 	
-	public ListDiscogsOrders getActiveDiscogsOrders() throws IOException, InterruptedException {
-        // Cliente HTTP
-        HttpClient client = HttpClient.newHttpClient();
-        
-        
-        // Petición HTTP
-        HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .header("Authorization", "Discogs token=" + TOKEN)
-                .uri(URI.create(DISCOGS_API_URL + "/marketplace/orders?archived=false&sort_order=desc"))
-                .build();
-        // Envía la Petición HTTP
-        
-        HttpResponse<String> response = requestHandler(client, request);
-        
-        // Comprueba si ha sido correcta la Petición HTTP
-        if(response.statusCode() == 200) {
-            ObjectMapper mapper = new ObjectMapper();
-            // Configuramos para que los campos que no aparecen en Order se ignoren
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            // Lee los valores y los guarda en la variable "orders"
-            
-            return mapper.readValue(response.body(), new TypeReference<ListDiscogsOrders>() {});
-        } else {
-            System.out.println("[ERROR " + response.statusCode() + "]: Trying to get all  orders");
-            System.out.println(response.body());
-            
-            return null;
-        }
-    }
+	
 	
 	
 	
@@ -241,13 +212,13 @@ public class DiscogsClient {
 	        double price, 
 	        String comments
 	        ) throws IOException, InterruptedException {
-	    // Validar los parámetros requeridos
 	    if (releaseId <= 0) {
 	        throw new IllegalArgumentException("El release_id es obligatorio y debe ser mayor a 0.");
 	    }
 	    if (price <= 0) {
 	        throw new IllegalArgumentException("El precio (price) debe ser mayor a 0.");
 	    }
+	    
 	    String status = "For Sale";
 	    String condition = "Mint (M)";
 	    String sleeveCondition = "Mint (M)";
