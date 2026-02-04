@@ -19,17 +19,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.pablito.dots.aop.Timed;
-import dev.pablito.dots.entity.DatabaseListing;
 import dev.pablito.dots.entity.DatabaseProvider;
 import dev.pablito.dots.entity.ProviderRequest;
-import dev.pablito.dots.services.ListingService;
 import dev.pablito.dots.services.ProviderService;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/dots")
 public class ProviderController {
-	
+
 	@Autowired
 	private ProviderService providerService;
 
@@ -42,53 +40,46 @@ public class ProviderController {
 		try {
 			providerService.createProvider(releaseId, request);
 		} catch (Exception e) {
-			logger.error("[TASK ERROR] createProvider({} {})", releaseId, request, e);
+			logger.error("[TASK ERROR] createProvider({} {})", releaseId, request.toString(), e);
 		}
 	}
-	
+
 	@Timed
 	@GetMapping("/releases/{releaseId}/providers")
-	public ResponseEntity<List<DatabaseProvider>>getProviders(@PathVariable Long releaseId) throws IOException, InterruptedException {
-        try {
-        	List<DatabaseProvider> response = providerService.getProviders(releaseId);
-            return new ResponseEntity<List<DatabaseProvider>>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            logger.error("[TASK ERROR] getProviders({})", releaseId, e);
-            return ResponseEntity.noContent().build();
-        }
-	}
-	
-	@Timed
-	@PutMapping("/releases/{releaseId}/providers/{providerId}")
-	public ResponseEntity<Void> updateProvider(
-	        @PathVariable Long releaseId,
-	        @PathVariable String providerId,
-	        @RequestBody ProviderRequest request) {
-	    try {
-	        providerService.updateProvider(releaseId, providerId, request);
-	        return ResponseEntity.ok().build();
-	    } catch (Exception e) {
-	        logger.error(
-	            "[TASK ERROR] updateProvider({}, {}, {})",
-	            releaseId, providerId, request, e
-	        );
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	    }
-	}
-	
-	@Timed
-	@DeleteMapping("/releases/{releaseId}/providers/{providerId}")
-	public ResponseEntity<Void> deleteProvider(
-	        @PathVariable Long releaseId,
-	        @PathVariable String providerId) {
-	    try {
-	        providerService.deleteProvider(releaseId, providerId);
-	        return ResponseEntity.ok().build();
-	    } catch (Exception e) {
-	        logger.error("[TASK ERROR] deleteProvider({}, {})", releaseId, providerId, e);
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	    }
+	public ResponseEntity<List<DatabaseProvider>> getProviders(@PathVariable Long releaseId)
+			throws IOException, InterruptedException {
+		try {
+			List<DatabaseProvider> response = providerService.getProviders(releaseId);
+			return new ResponseEntity<List<DatabaseProvider>>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] getProviders({})", releaseId, e);
+			return ResponseEntity.noContent().build();
+		}
 	}
 
+	@Timed
+	@PutMapping("/releases/{releaseId}/providers/{providerId}")
+	public ResponseEntity<Void> updateProvider(@PathVariable Long releaseId, @PathVariable String providerId,
+			@RequestBody ProviderRequest request) {
+		try {
+			providerService.updateProvider(releaseId, providerId, request);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] updateProvider({}, {}, {})", releaseId, providerId, request.toString(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	@Timed
+	@DeleteMapping("/releases/{releaseId}/providers/{providerId}")
+	public ResponseEntity<Void> deleteProvider(@PathVariable Long releaseId, @PathVariable String providerId) {
+		try {
+			providerService.deleteProvider(releaseId, providerId);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] deleteProvider({}, {})", releaseId, providerId, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
 
 }

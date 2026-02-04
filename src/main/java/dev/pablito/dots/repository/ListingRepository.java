@@ -6,11 +6,10 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import dev.pablito.dots.entity.DatabaseListing;
-import dev.pablito.dots.entity.DatabaseOrder;
 
 @Repository
 public interface ListingRepository extends MongoRepository<DatabaseListing, String> {
-	
-	List<DatabaseListing> findByReleaseId(Long releaseId);
+
+	List<DatabaseListing> findByReleaseIdAndProviderId(Long releaseId, String providerId);
 
 }
