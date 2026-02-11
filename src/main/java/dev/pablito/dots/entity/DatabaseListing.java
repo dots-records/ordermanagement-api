@@ -19,6 +19,7 @@ public class DatabaseListing {
 	private String platform;
 	private String link;
 	private Double sellingPrice;
+	private Long discogsListingId;
 
 	public DatabaseListing(Long releaseId, String providerId, String platform, String link, Double sellingPrice) {
 		super();
@@ -67,6 +68,22 @@ public class DatabaseListing {
 
 	public void setSellingPrice(Double sellingPrice) {
 		this.sellingPrice = sellingPrice;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Long getDiscogsListingId() {
+		return discogsListingId;
+	}
+
+	public void setDiscogsListingId(Long discogsListingId) {
+		this.discogsListingId = discogsListingId;
 	}
 
 }
