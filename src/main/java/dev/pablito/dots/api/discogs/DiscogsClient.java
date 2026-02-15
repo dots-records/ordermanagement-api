@@ -265,7 +265,7 @@ public class DiscogsClient {
 				.header("Content-Type", "application/json").header("Authorization", "Discogs token=" + TOKEN)
 				.uri(URI.create(DISCOGS_API_URL + "/marketplace/orders/" + id)).build();
 
-		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		HttpResponse<String> response = requestHandler(client, request);
 
 		if (response.statusCode() == 200) {
 			ObjectMapper mapper = new ObjectMapper();
@@ -276,6 +276,29 @@ public class DiscogsClient {
 			});
 		} else {
 			System.out.println("[ERROR " + response.statusCode() + "]: Trying to update order " + id);
+			System.out.println(response.body());
+			return null;
+		}
+	}
+
+	public String updateDiscogsListingSellingPrice(Long id, Double newPrice) throws IOException, InterruptedException {
+		HttpClient client = HttpClient.newHttpClient();
+
+		String jsonPayload = String.format("{\"price\": \"%s\"}", newPrice);
+		HttpRequest request = HttpRequest.newBuilder().POST(BodyPublishers.ofString(jsonPayload))
+				.header("Content-Type", "application/json").header("Authorization", "Discogs token=" + TOKEN)
+				.uri(URI.create(DISCOGS_API_URL + "/marketplace/listings/" + id)).build();
+
+		HttpResponse<String> response = requestHandler(client, request);
+
+		if (response.statusCode() == 200) {
+			ObjectMapper mapper = new ObjectMapper();
+			// Configuramos para que los campos que no aparecen en Order se ignoren
+			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			// Lee los valores y los guarda en la variable "order"
+			return response.body();
+		} else {
+			System.out.println("[ERROR " + response.statusCode() + "]: Trying to update listing " + id);
 			System.out.println(response.body());
 			return null;
 		}
@@ -301,6 +324,27 @@ public class DiscogsClient {
 		} else {
 			System.out.println("[ERROR " + response.statusCode() + "]: Trying to send message to " + id);
 			System.out.println(response.body());
+		}
+	}
+
+	public String deleteDiscogsListing(Long id) throws IOException, InterruptedException {
+		if (id == null || id <= 0) {
+			throw new IllegalArgumentException("El listing_id es obligatorio y debe ser mayor a 0.");
+		}
+
+		HttpClient client = HttpClient.newHttpClient();
+
+		HttpRequest request = HttpRequest.newBuilder().DELETE().header("Authorization", "Discogs token=" + TOKEN)
+				.uri(URI.create(DISCOGS_API_URL + "/marketplace/listings/" + id)).build();
+
+		HttpResponse<String> response = requestHandler(client, request);
+
+		if (response.statusCode() == 204) { // 204 No Content = borrado correcto
+			return "Listing eliminado correctamente en Discogs";
+		} else {
+			System.out.println("[ERROR " + response.statusCode() + "]: Trying to delete listing " + id);
+			System.out.println(response.body());
+			return null;
 		}
 	}
 

@@ -1,11 +1,8 @@
 package dev.pablito.dots.services;
 
-import dev.pablito.dots.aop.Timed;
-import dev.pablito.dots.api.discogs.DiscogsClient;
-import dev.pablito.dots.api.discogs.DiscogsRelease;
-import dev.pablito.dots.entity.DatabaseRelease;
-import dev.pablito.dots.mapper.ReleaseMapper;
-import dev.pablito.dots.repository.ReleaseRepository;
+import java.io.IOException;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.List;
+import dev.pablito.dots.aop.Timed;
+import dev.pablito.dots.api.discogs.DiscogsClient;
+import dev.pablito.dots.api.discogs.DiscogsRelease;
+import dev.pablito.dots.entity.DatabaseRelease;
+import dev.pablito.dots.repository.ReleaseRepository;
 
 @Service
 public class ReleaseService {
@@ -29,7 +29,7 @@ public class ReleaseService {
 	public DiscogsRelease getReleaseFromDiscogs(Long id) throws IOException, InterruptedException {
 		return discogsClient.getRelease(id);
 	}
-	
+
 	@Timed
 	public void postRelease(DatabaseRelease release) {
 		releaseRepository.insert(release);
@@ -69,37 +69,35 @@ public class ReleaseService {
 	}
 
 	@Timed
-	public DatabaseRelease getRelease(Long id) throws IOException, InterruptedException {
+	public DatabaseRelease getRelease(Long id) {
 		return releaseRepository.findById(id).get();
 	}
 
 	@Timed
 	public void deleteReleases(List<Long> ids) {
-	    releaseRepository.deleteAllById(ids);
+		releaseRepository.deleteAllById(ids);
 	}
 
 	@Timed
 	public void archiveReleases(List<Long> ids) {
-	    List<DatabaseRelease> releases = releaseRepository.findAllById(ids);
-	    for (DatabaseRelease release : releases) {
-	        release.setArchived(true);
-	    }
-	    releaseRepository.saveAll(releases);
+		List<DatabaseRelease> releases = releaseRepository.findAllById(ids);
+		for (DatabaseRelease release : releases) {
+			release.setArchived(true);
+		}
+		releaseRepository.saveAll(releases);
 	}
 
 	@Timed
 	public void unarchiveReleases(List<Long> ids) {
-	    List<DatabaseRelease> releases = releaseRepository.findAllById(ids);
-	    for (DatabaseRelease release : releases) {
-	        release.setArchived(false);
-	    }
-	    releaseRepository.saveAll(releases);
+		List<DatabaseRelease> releases = releaseRepository.findAllById(ids);
+		for (DatabaseRelease release : releases) {
+			release.setArchived(false);
+		}
+		releaseRepository.saveAll(releases);
 	}
-	
+
 	public boolean contains(Long id) {
-	    return releaseRepository.existsById(id);
+		return releaseRepository.existsById(id);
 	}
-	
-	
 
 }

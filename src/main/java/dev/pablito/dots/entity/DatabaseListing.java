@@ -1,5 +1,7 @@
 package dev.pablito.dots.entity;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,6 +21,7 @@ public class DatabaseListing {
 	private String platform;
 	private String link;
 	private Double sellingPrice;
+	private LocalDateTime dateLastEdition;
 	private Long discogsListingId;
 
 	public DatabaseListing(Long releaseId, String providerId, String platform, String link, Double sellingPrice) {
@@ -84,6 +87,14 @@ public class DatabaseListing {
 
 	public void setDiscogsListingId(Long discogsListingId) {
 		this.discogsListingId = discogsListingId;
+	}
+
+	public LocalDateTime getDateLastEdition() {
+		return dateLastEdition;
+	}
+
+	public void setDateLastEdition(LocalDateTime dateLastEdition) {
+		this.dateLastEdition = dateLastEdition;
 	}
 
 }

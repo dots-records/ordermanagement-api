@@ -1,6 +1,7 @@
 package dev.pablito.dots.services;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,13 +56,66 @@ public class ListingService {
 			listing.setLink("https://www.discogs.com/es/sell/item/" + discogsListingId);
 
 		}
+		listing.setDateLastEdition(LocalDateTime.now());
 		listingRepository.insert(listing);
+	}
+
+	@Timed
+	public void updateSellingPrice(long releaseId, String providerId, String listingId, Double newSellingPrice)
+			throws IOException, InterruptedException {
+		Optional<DatabaseListing> optListing = listingRepository.findByIdAndReleaseIdAndProviderId(listingId, releaseId,
+				providerId);
+
+		if (optListing.isEmpty()) {
+			return;
+		}
+		DatabaseListing listing = optListing.get();
+		if (listing.getPlatform().equals("Discogs") && listing.getDiscogsListingId() != null) {
+			double priceWithFees = Math.round((newSellingPrice / discogsRealBenefit) * 10.0) / 10.0;
+			String response = discogsClient.updateDiscogsListingSellingPrice(listing.getDiscogsListingId(),
+					priceWithFees);
+		}
+		listing.setSellingPrice(newSellingPrice);
+		listing.setDateLastEdition(LocalDateTime.now());
+		listingRepository.save(listing);
+	}
+
+	@Timed
+	public void updateLink(long releaseId, String providerId, String listingId, String newLink) {
+		Optional<DatabaseListing> optListing = listingRepository.findByIdAndReleaseIdAndProviderId(listingId, releaseId,
+				providerId);
+
+		if (optListing.isEmpty()) {
+			return;
+		}
+		DatabaseListing listing = optListing.get();
+		listing.setLink(newLink);
+		listing.setDateLastEdition(LocalDateTime.now());
+		listingRepository.save(listing);
 	}
 
 	@Timed
 	public List<DatabaseListing> getListings(long releaseId, String providerId)
 			throws IOException, InterruptedException {
 		return listingRepository.findByReleaseIdAndProviderId(releaseId, providerId);
+	}
+
+	@Timed
+	public void deleteListing(long releaseId, String providerId, String listingId)
+			throws IOException, InterruptedException {
+
+		Optional<DatabaseListing> optListing = listingRepository.findByIdAndReleaseIdAndProviderId(listingId, releaseId,
+				providerId);
+
+		if (optListing.isEmpty()) {
+			return;
+		}
+
+		DatabaseListing listing = optListing.get();
+		if ("Discogs".equals(listing.getPlatform()) && listing.getDiscogsListingId() != null) {
+			discogsClient.deleteDiscogsListing(listing.getDiscogsListingId());
+		}
+		listingRepository.delete(listing);
 	}
 
 }
