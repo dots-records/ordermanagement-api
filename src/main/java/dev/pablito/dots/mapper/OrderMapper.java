@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,7 @@ public class OrderMapper {
 
 		List<DatabaseOrder.DatabaseItem> dbItems = order.getItems().stream().map(item -> {
 			DatabaseOrder.DatabaseItem dbItem = new DatabaseOrder.DatabaseItem();
+			dbItem.setId(UUID.randomUUID().toString());
 
 			DatabaseRelease release = null;
 

@@ -23,7 +23,7 @@ public class ReleaseService {
 	@Autowired
 	private DiscogsClient discogsClient;
 
-	private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
+	private static final Logger logger = LoggerFactory.getLogger(ReleaseService.class);
 
 	@Timed
 	public DiscogsRelease getReleaseFromDiscogs(Long id) throws IOException, InterruptedException {

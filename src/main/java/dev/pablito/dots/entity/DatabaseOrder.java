@@ -57,16 +57,16 @@ public class DatabaseOrder {
 
 	public static class DatabaseItem {
 		@Id
-		private Long id;
+		private String id;
 		private DatabaseReleaseItem release;
 		private DatabaseProviderItem provider;
 		private DatabaseListingItem listing;
 
-		public Long getId() {
+		public String getId() {
 			return id;
 		}
 
-		public void setId(Long id) {
+		public void setId(String id) {
 			this.id = id;
 		}
 
