@@ -71,6 +71,7 @@ public class OrderMapper {
 		List<DatabaseOrder.DatabaseItem> dbItems = order.getItems().stream().map(item -> {
 			DatabaseOrder.DatabaseItem dbItem = new DatabaseOrder.DatabaseItem();
 			dbItem.setId(UUID.randomUUID().toString());
+			dbItem.setAssociated(false);
 
 			DatabaseRelease release = null;
 
@@ -93,7 +94,6 @@ public class OrderMapper {
 		dbOrder.setItems(dbItems);
 
 		dbOrder.setJustAdded(true);
-		dbOrder.setAssociated(false);
 		/*
 		 * List<DatabaseOrder.DatabaseItem> dbItems = order.getItems().stream()
 		 * .map(item -> { DatabaseOrder.DatabaseItem dbItem = new

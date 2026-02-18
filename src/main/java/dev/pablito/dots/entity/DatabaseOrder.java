@@ -31,7 +31,6 @@ public class DatabaseOrder {
 	private Integer newMessagesSeller;
 	private Integer newMessagesDiscogs;
 	private boolean justAdded;
-	private boolean associated;
 	private String uri;
 
 	public static class Payment {
@@ -61,6 +60,7 @@ public class DatabaseOrder {
 		private DatabaseReleaseItem release;
 		private DatabaseProviderItem provider;
 		private DatabaseListingItem listing;
+		private boolean associated;
 
 		public String getId() {
 			return id;
@@ -92,6 +92,14 @@ public class DatabaseOrder {
 
 		public void setListing(DatabaseListingItem listing) {
 			this.listing = listing;
+		}
+
+		public boolean isAssociated() {
+			return associated;
+		}
+
+		public void setAssociated(boolean associated) {
+			this.associated = associated;
 		}
 
 		public static class DatabaseReleaseItem {
@@ -414,14 +422,6 @@ public class DatabaseOrder {
 
 	public void setUri(String uri) {
 		this.uri = uri;
-	}
-
-	public boolean isAssociated() {
-		return associated;
-	}
-
-	public void setAssociated(boolean associated) {
-		this.associated = associated;
 	}
 
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dev.pablito.dots.aop.Timed;
 import dev.pablito.dots.entity.ListingItemRequest;
+import dev.pablito.dots.entity.ProviderItemRequest;
 import dev.pablito.dots.services.ItemService;
 
 @RestController
@@ -39,16 +40,31 @@ public class ItemController {
 		}
 	}
 
-	// TODO
 	@Timed
 	@PatchMapping("/orders/{orderId}/items/{itemId}/provider")
-	public ResponseEntity<Void> patchOrderItemProvider(@PathVariable String orderId, @PathVariable Long itemId,
-			@RequestBody Map<String, String> body) {
+	public ResponseEntity<Void> patchOrderItemProvider(@PathVariable String orderId, @PathVariable String itemId,
+			@RequestBody ProviderItemRequest request) {
 		try {
+			itemService.updateProviderItem(orderId, itemId, request);
+			return ResponseEntity.ok().build();
 		} catch (Exception e) {
+			logger.error("[TASK ERROR] patchOrderItemProvider({}, {}, {}, {})", orderId, itemId, request, e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
-		return null;
+	}
+
+	@Timed
+	@PatchMapping("/orders/{orderId}/items/{itemId}/associated")
+	public ResponseEntity<Void> patchOrderItemAssociated(@PathVariable String orderId, @PathVariable String itemId,
+			@RequestBody Map<String, Boolean> body) {
+		try {
+			Boolean associated = body.get("associated");
+			itemService.updateAssociatedItem(orderId, itemId, associated);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] patchOrderItemAssociated({}, {}, {}, {})", orderId, itemId, body, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 
 }

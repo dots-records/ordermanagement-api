@@ -1,8 +1,7 @@
 package dev.pablito.dots.services;
 
 import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -185,7 +184,7 @@ public class OrderService {
 	public void checkOrdersInDiscogs() throws Exception {
 		if (ordersInfoRepository.findAll().isEmpty()) {
 			OrdersInfo new_info = new OrdersInfo();
-			new_info.setCreatedAfter("1900-01-01T08:43:03.9248907-07:00");
+			new_info.setCreatedAfter("1900-01-01T08:43:03.9248907-08:00");
 			ordersInfoRepository.insert(new_info);
 		}
 		OrdersInfo info = ordersInfoRepository.findAll().getFirst();
@@ -235,8 +234,8 @@ public class OrderService {
 	// Other
 
 	private String getActualDate() {
-		ZoneOffset zonaHoraria = ZoneOffset.of("-07:00"); // UTC-7
-		OffsetDateTime horaActual = OffsetDateTime.now(zonaHoraria);
+		ZoneId zoneId = ZoneId.of("America/Los_Angeles");
+		ZonedDateTime horaActual = ZonedDateTime.now(zoneId);
 		return horaActual.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 	}
 
