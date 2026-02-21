@@ -55,12 +55,27 @@ public class DatabaseOrder {
 	}
 
 	public static class DatabaseItem {
-		@Id
 		private String id;
 		private DatabaseReleaseItem release;
 		private DatabaseProviderItem provider;
 		private DatabaseListingItem listing;
 		private boolean associated;
+		private String discCondition;
+		private String sleeveCondition;
+
+		public DatabaseItem() {
+			super();
+		}
+
+		public DatabaseItem(String id, DatabaseReleaseItem release, DatabaseProviderItem provider,
+				DatabaseListingItem listing, boolean associated) {
+			super();
+			this.id = id;
+			this.release = release;
+			this.provider = provider;
+			this.listing = listing;
+			this.associated = associated;
+		}
 
 		public String getId() {
 			return id;
@@ -102,11 +117,30 @@ public class DatabaseOrder {
 			this.associated = associated;
 		}
 
+		public String getDiscCondition() {
+			return discCondition;
+		}
+
+		public void setDiscCondition(String discCondition) {
+			this.discCondition = discCondition;
+		}
+
+		public String getSleeveCondition() {
+			return sleeveCondition;
+		}
+
+		public void setSleeveCondition(String sleeveCondition) {
+			this.sleeveCondition = sleeveCondition;
+		}
+
 		public static class DatabaseReleaseItem {
 			private Long id;
 			private String name;
 			private List<Artist> artists;
 			private String thumb;
+
+			public DatabaseReleaseItem() {
+			}
 
 			public DatabaseReleaseItem(Long id, String name, List<Artist> artists, String thumb) {
 				super();

@@ -1,11 +1,7 @@
 package dev.pablito.dots.controller;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.List;
-
-import dev.pablito.dots.aop.Timed;
-import dev.pablito.dots.api.discogs.DiscogsRelease;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.pablito.dots.entity.DatabaseOrder;
+import dev.pablito.dots.aop.Timed;
+import dev.pablito.dots.api.discogs.DiscogsRelease;
 import dev.pablito.dots.entity.DatabaseRelease;
 import dev.pablito.dots.entity.SearchRequest;
 import dev.pablito.dots.mapper.ReleaseMapper;
@@ -42,29 +39,34 @@ public class ReleaseController {
 	@PostMapping("/putReleaseFromDiscogs/{id}")
 	public void putReleaseFromDiscogs(@PathVariable Long id) throws IOException, InterruptedException {
 		try {
-			if(!releaseService.contains(id)) {
-        		DiscogsRelease discogsRelease = releaseService.getReleaseFromDiscogs(id);
-        		if(discogsRelease != null) {
-            		ReleaseMapper mapper = new ReleaseMapper();
-            		releaseService.postRelease(mapper.mapToDatabaseRelease(discogsRelease));
-        		}
-        	} 
+			if (!releaseService.contains(id)) {
+				DiscogsRelease discogsRelease = releaseService.getReleaseFromDiscogs(id);
+				if (discogsRelease != null) {
+					ReleaseMapper mapper = new ReleaseMapper();
+					releaseService.postRelease(mapper.mapToDatabaseRelease(discogsRelease));
+				}
+			}
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] putReleaseFromDiscogs({})", id, e);
 		}
 	}
-	
+
 	// Gets release identified by "id" from database "Releases"
 	@Timed
 	@GetMapping("/getRelease/{id}")
-	public ResponseEntity<DatabaseRelease>getRelease(@PathVariable Long id) throws IOException, InterruptedException {
-        try {
-        	DatabaseRelease response = releaseService.getRelease(id);
-            return new ResponseEntity<DatabaseRelease>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            logger.error("[TASK ERROR] getRelease({})", id, e);
-            return ResponseEntity.noContent().build();
-        }
+	public ResponseEntity<DatabaseRelease> getRelease(@PathVariable Long id) throws IOException, InterruptedException {
+		try {
+			DatabaseRelease response = releaseService.getRelease(id);
+
+			if (response == null) {
+				return ResponseEntity.notFound().build();
+			}
+
+			return new ResponseEntity<DatabaseRelease>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] getRelease({})", id, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 
 	// Gets all releases from database "Releases"
@@ -80,7 +82,7 @@ public class ReleaseController {
 			return ResponseEntity.noContent().build();
 		}
 	}
-	
+
 	// Gets releases which archived = false from database "Releases"
 	@Timed
 	@GetMapping("/getUnarchivedReleases/page={page}&size={size}")
@@ -94,7 +96,7 @@ public class ReleaseController {
 			return ResponseEntity.noContent().build();
 		}
 	}
-	
+
 	// Gets releases which archived = true from database "Releases"
 	@Timed
 	@GetMapping("/getArchivedReleases/page={page}&size={size}")
@@ -109,7 +111,7 @@ public class ReleaseController {
 		}
 	}
 
-	//TODO: Cambiar a get
+	// TODO: Cambiar a get
 	// Search all releases which in database "Releases"
 	@Timed
 	@PostMapping("/searchAllReleases/page={page}&size={size}")
@@ -123,38 +125,39 @@ public class ReleaseController {
 			return ResponseEntity.noContent().build();
 		}
 	}
-	
-	//TODO: Cambiar a get
+
+	// TODO: Cambiar a get
 	// Search releases which archived = false in database "Releases"
 	@Timed
 	@PostMapping("/searchUnarchivedReleases/page={page}&size={size}")
 	public ResponseEntity<Page<DatabaseRelease>> searchUnarchivedReleases(@RequestBody SearchRequest request,
 			@PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
 		try {
-			Page<DatabaseRelease> response = releaseService.searchReleasesByArchived(request.getSearch(), page, size, false);
+			Page<DatabaseRelease> response = releaseService.searchReleasesByArchived(request.getSearch(), page, size,
+					false);
 			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] searchUnarchivedReleases({}, {}, {})", request.getSearch(), size, page, e);
 			return ResponseEntity.noContent().build();
 		}
 	}
-	
-	//TODO: Cambiar a get
+
+	// TODO: Cambiar a get
 	// Search releases which archived = true in database "Releases"
 	@Timed
 	@PostMapping("/searchArchivedReleases/page={page}&size={size}")
 	public ResponseEntity<Page<DatabaseRelease>> searchArchivedReleases(@RequestBody SearchRequest request,
 			@PathVariable int page, @PathVariable int size) throws IOException, InterruptedException {
 		try {
-			Page<DatabaseRelease> response = releaseService.searchReleasesByArchived(request.getSearch(), page, size, true);
+			Page<DatabaseRelease> response = releaseService.searchReleasesByArchived(request.getSearch(), page, size,
+					true);
 			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] searchArchivedReleases({}, {}, {})", request.getSearch(), size, page, e);
 			return ResponseEntity.noContent().build();
 		}
 	}
-	
-		
+
 	// Delete selected releases identified by id which in database "Releases"
 	@Timed
 	@PostMapping("/deleteReleases")
@@ -164,9 +167,9 @@ public class ReleaseController {
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] deleteReleases({})", ids, e);
 		}
-		
+
 	}
-	
+
 	// Archive selected releases identified by id which in database "Releases"
 	@Timed
 	@PostMapping("/archiveReleases")
@@ -175,9 +178,9 @@ public class ReleaseController {
 			releaseService.archiveReleases(ids);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] archiveReleases({})", ids, e);
-		}	
+		}
 	}
-	
+
 	// Unarchive selected releases identified by id which in database "Releases"
 	@Timed
 	@PostMapping("/unarchiveReleases")
@@ -186,7 +189,7 @@ public class ReleaseController {
 			releaseService.unarchiveReleases(ids);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] unarchiveReleases({})", ids, e);
-		}	
+		}
 	}
 
 }

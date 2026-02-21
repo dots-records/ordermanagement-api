@@ -30,6 +30,34 @@ public class OrderMapper {
 	@Autowired
 	private ReleaseService releaseService;
 
+	private String mapCondition(String fullCondition) {
+		if (fullCondition == null)
+			return null;
+
+		switch (fullCondition) {
+		case "Mint (M)":
+			return "M";
+		case "Near Mint (NM or M-)":
+			return "NM";
+		case "Near Mint (NM)":
+			return "NM";
+		case "Very Good Plus (VG+)":
+			return "VG+";
+		case "Very Good (VG)":
+			return "VG";
+		case "Good Plus (G+)":
+			return "G+";
+		case "Good (G)":
+			return "G";
+		case "Fair (F)":
+			return "F";
+		case "Poor (P)":
+			return "P";
+		default:
+			return fullCondition; // fallback
+		}
+	}
+
 	public DatabaseOrder mapToDatabaseOrder(DiscogsOrder order) throws IOException, InterruptedException {
 		if (order == null) {
 			return null;
@@ -72,6 +100,8 @@ public class OrderMapper {
 			DatabaseOrder.DatabaseItem dbItem = new DatabaseOrder.DatabaseItem();
 			dbItem.setId(UUID.randomUUID().toString());
 			dbItem.setAssociated(false);
+			dbItem.setDiscCondition(mapCondition(item.getMedia_condition()));
+			dbItem.setSleeveCondition(mapCondition(item.getSleeve_condition()));
 
 			DatabaseRelease release = null;
 

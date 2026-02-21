@@ -59,6 +59,16 @@ public class ProviderService {
 		providerRepository.save(provider);
 	}
 
+	public void updateProviderUnits(Long releaseId, String providerId, Integer units) {
+
+		DatabaseProvider provider = providerRepository.findByIdAndReleaseId(providerId, releaseId)
+				.orElseThrow(() -> new RuntimeException("Provider not found"));
+		if ("In Stock".equals(provider.getType())) {
+			provider.setUnits(units);
+		}
+		providerRepository.save(provider);
+	}
+
 	public void deleteProvider(Long releaseId, String providerId) {
 		DatabaseProvider provider = providerRepository.findByIdAndReleaseId(providerId, releaseId)
 				.orElseThrow(() -> new RuntimeException("Provider not found"));

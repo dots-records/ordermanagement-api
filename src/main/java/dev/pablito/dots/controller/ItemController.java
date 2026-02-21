@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.pablito.dots.aop.Timed;
 import dev.pablito.dots.entity.ListingItemRequest;
 import dev.pablito.dots.entity.ProviderItemRequest;
+import dev.pablito.dots.entity.ReleaseItemRequest;
 import dev.pablito.dots.services.ItemService;
 
 @RestController
@@ -49,6 +50,20 @@ public class ItemController {
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderItemProvider({}, {}, {}, {})", orderId, itemId, request, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	@Timed
+	@PatchMapping("/orders/{orderId}/items/{itemId}/release")
+	public ResponseEntity<Void> patchOrderItemRelease(@PathVariable String orderId, @PathVariable String itemId,
+			@RequestBody ReleaseItemRequest request) {
+		try {
+
+			itemService.updateReleaseItem(orderId, itemId, request);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] patchOrderItemRelease({}, {}, {}, {})", orderId, itemId, request, e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}

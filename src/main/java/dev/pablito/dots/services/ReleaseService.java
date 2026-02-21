@@ -70,7 +70,7 @@ public class ReleaseService {
 
 	@Timed
 	public DatabaseRelease getRelease(Long id) {
-		return releaseRepository.findById(id).get();
+		return releaseRepository.findById(id).orElse(null);
 	}
 
 	@Timed

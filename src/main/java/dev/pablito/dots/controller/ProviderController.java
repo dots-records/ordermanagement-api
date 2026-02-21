@@ -2,6 +2,7 @@ package dev.pablito.dots.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -66,6 +68,20 @@ public class ProviderController {
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] updateProvider({}, {}, {})", releaseId, providerId, request.toString(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	@Timed
+	@PatchMapping("/releases/{releaseId}/providers/{providerId}/units")
+	public ResponseEntity<Void> patchProviderUnits(@PathVariable Long releaseId, @PathVariable String providerId,
+			@RequestBody Map<String, Integer> body) {
+		try {
+			Integer units = body.get("units");
+			providerService.updateProviderUnits(releaseId, providerId, units);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] updateProviderUnits({}, {}, {})", releaseId, providerId, body, e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
