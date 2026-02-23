@@ -101,6 +101,19 @@ public class OrderController {
 	}
 
 	@Timed
+	@PatchMapping("/orders/{id}/paymentId")
+	public ResponseEntity<Void> patchOrderPaymentId(@PathVariable String id, @RequestBody Map<String, String> body) {
+		try {
+			String paymentId = body.get("paymentId");
+			orderService.updateOrderPaymentId(id, paymentId);
+			return ResponseEntity.noContent().build();
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] patchOrderStatus({}, body={})", id, body, e);
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+
+	@Timed
 	@PatchMapping("/orders/{id}/justAdded")
 	public ResponseEntity<Void> patchOrderJustAdded(@PathVariable String id, @RequestBody Map<String, String> body) {
 		try {
@@ -115,6 +128,32 @@ public class OrderController {
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderJustAdded({}, body={})", id, body, e);
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+
+	@Timed
+	@PatchMapping("/orders/{id}/warning")
+	public ResponseEntity<Void> patchOrderWarning(@PathVariable String id, @RequestBody Map<String, String> body) {
+		try {
+			String warning = body.get("warning");
+			orderService.updateOrderWarning(id, warning);
+			return ResponseEntity.noContent().build();
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] patchOrderWarning({}, body={})", id, body, e);
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+
+	@Timed
+	@PatchMapping("/orders/{id}/information")
+	public ResponseEntity<Void> patchOrderInformation(@PathVariable String id, @RequestBody Map<String, String> body) {
+		try {
+			String information = body.get("information");
+			orderService.updateOrderInformation(id, information);
+			return ResponseEntity.noContent().build();
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] patchOrderInformation({}, body={})", id, body, e);
 			return ResponseEntity.internalServerError().build();
 		}
 	}

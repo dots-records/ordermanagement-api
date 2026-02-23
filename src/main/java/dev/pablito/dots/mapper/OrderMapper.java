@@ -18,7 +18,6 @@ import dev.pablito.dots.entity.Artist;
 import dev.pablito.dots.entity.DatabaseOrder;
 import dev.pablito.dots.entity.DatabaseOrder.DatabaseItem.DatabaseReleaseItem;
 import dev.pablito.dots.entity.DatabaseRelease;
-import dev.pablito.dots.entity.MessageManager;
 import dev.pablito.dots.services.ReleaseService;
 
 @Component
@@ -86,13 +85,6 @@ public class OrderMapper {
 		dbOrder.setCreated(ZonedDateTime.parse(order.getCreated()).format(formatter));
 		dbOrder.setCreatedComplete(order.getCreated());
 		dbOrder.setArchived(order.isArchived());
-		dbOrder.setRevenue(order.getRevenue());
-
-		// Map Payment
-		DatabaseOrder.Payment payment = new DatabaseOrder.Payment();
-		payment.setShipping(order.getShipping() != null ? order.getShipping().getValue() : null);
-		payment.setItems(order.getTotal() != null ? order.getTotal().getValue() : null);
-		dbOrder.setPayment(payment);
 
 		// Map Items
 
@@ -124,25 +116,7 @@ public class OrderMapper {
 		dbOrder.setItems(dbItems);
 
 		dbOrder.setJustAdded(true);
-		/*
-		 * List<DatabaseOrder.DatabaseItem> dbItems = order.getItems().stream()
-		 * .map(item -> { DatabaseOrder.DatabaseItem dbItem = new
-		 * DatabaseOrder.DatabaseItem(); dbItem.setId(item.getId()); Release release;
-		 * dbItem.setName("Hola"); return dbItem; }) .collect(Collectors.toList());
-		 * dbOrder.setItems(dbItems);
-		 */
-
-		// Set delivery_date if applicable
-		dbOrder.setNotified(false);
-		dbOrder.setNewMessagesCustomer(0);
-		dbOrder.setNewMessagesSeller(0);
-		dbOrder.setNewMessagesDiscogs(0);
-
-		MessageManager messageManager = new MessageManager();
-		dbOrder.setMessageManager(messageManager);
 		dbOrder.setUri(order.getUri());
-		;
-
 		return dbOrder;
 	}
 }

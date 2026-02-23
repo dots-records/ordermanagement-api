@@ -23,36 +23,11 @@ public class DatabaseOrder {
 	private String created;
 	private String createdComplete;
 	private boolean archived;
-	private Payment payment;
-	private Double revenue;
-	private boolean notified;
-	private MessageManager messageManager;
-	private Integer newMessagesCustomer;
-	private Integer newMessagesSeller;
-	private Integer newMessagesDiscogs;
+	private String paymentId;
 	private boolean justAdded;
 	private String uri;
-
-	public static class Payment {
-		private Double shipping;
-		private Double items;
-
-		public Double getShipping() {
-			return shipping;
-		}
-
-		public void setShipping(Double shipping) {
-			this.shipping = shipping;
-		}
-
-		public Double getItems() {
-			return items;
-		}
-
-		public void setItems(Double items) {
-			this.items = items;
-		}
-	}
+	private String warning;
+	private String information;
 
 	public static class DatabaseItem {
 		private String id;
@@ -362,20 +337,12 @@ public class DatabaseOrder {
 		this.archived = archived;
 	}
 
-	public Payment getPayment() {
-		return payment;
+	public String getPaymentId() {
+		return paymentId;
 	}
 
-	public void setPayment(Payment payment) {
-		this.payment = payment;
-	}
-
-	public Double getRevenue() {
-		return revenue;
-	}
-
-	public void setRevenue(Double revenue) {
-		this.revenue = revenue;
+	public void setPaymentId(String paymentId) {
+		this.paymentId = paymentId;
 	}
 
 	public String getId() {
@@ -386,52 +353,12 @@ public class DatabaseOrder {
 		this.id = id;
 	}
 
-	public boolean isNotified() {
-		return notified;
-	}
-
-	public void setNotified(boolean notified) {
-		this.notified = notified;
-	}
-
-	public MessageManager getMessageManager() {
-		return messageManager;
-	}
-
-	public void setMessageManager(MessageManager messageManager) {
-		this.messageManager = messageManager;
-	}
-
 	public String getPlatform() {
 		return platform;
 	}
 
 	public void setPlatform(String platform) {
 		this.platform = platform;
-	}
-
-	public Integer getNewMessagesCustomer() {
-		return newMessagesCustomer;
-	}
-
-	public void setNewMessagesCustomer(Integer newMessagesCustomer) {
-		this.newMessagesCustomer = newMessagesCustomer;
-	}
-
-	public Integer getNewMessagesSeller() {
-		return newMessagesSeller;
-	}
-
-	public void setNewMessagesSeller(Integer newMessagesSeller) {
-		this.newMessagesSeller = newMessagesSeller;
-	}
-
-	public Integer getNewMessagesDiscogs() {
-		return newMessagesDiscogs;
-	}
-
-	public void setNewMessagesDiscogs(Integer newMessagesDiscogs) {
-		this.newMessagesDiscogs = newMessagesDiscogs;
 	}
 
 	public String getCreatedComplete() {
@@ -456,6 +383,22 @@ public class DatabaseOrder {
 
 	public void setUri(String uri) {
 		this.uri = uri;
+	}
+
+	public String getWarning() {
+		return warning;
+	}
+
+	public void setWarning(String warning) {
+		this.warning = warning;
+	}
+
+	public String getInformation() {
+		return information;
+	}
+
+	public void setInformation(String information) {
+		this.information = information;
 	}
 
 }

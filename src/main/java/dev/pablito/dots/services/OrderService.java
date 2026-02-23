@@ -22,7 +22,6 @@ import dev.pablito.dots.aop.Timed;
 import dev.pablito.dots.api.discogs.DiscogsClient;
 import dev.pablito.dots.api.discogs.DiscogsOrder;
 import dev.pablito.dots.entity.DatabaseOrder;
-import dev.pablito.dots.entity.Message;
 import dev.pablito.dots.entity.OrderRequest;
 import dev.pablito.dots.entity.OrdersInfo;
 import dev.pablito.dots.mapper.OrderMapper;
@@ -131,10 +130,35 @@ public class OrderService {
 	}
 
 	@Timed
+	public Optional<DatabaseOrder> updateOrderWarning(String id, String warning) {
+		return orderRepository.findById(id).map(order -> {
+			// Actualizar el estado del pedido
+			order.setWarning(warning);
+			return orderRepository.save(order);
+		});
+	}
+
+	@Timed
+	public Optional<DatabaseOrder> updateOrderInformation(String id, String information) {
+		return orderRepository.findById(id).map(order -> {
+			order.setInformation(information);
+			return orderRepository.save(order);
+		});
+	}
+
+	@Timed
 	public Optional<DatabaseOrder> updateOrderJustAdded(String id, Boolean justAdded) {
 		return orderRepository.findById(id).map(order -> {
 			// Actualizar el estado del pedido
 			order.setJustAdded(justAdded);
+			return orderRepository.save(order);
+		});
+	}
+
+	@Timed
+	public Optional<DatabaseOrder> updateOrderPaymentId(String id, String paymentId) {
+		return orderRepository.findById(id).map(order -> {
+			order.setPaymentId(paymentId);
 			return orderRepository.save(order);
 		});
 	}
@@ -224,11 +248,6 @@ public class OrderService {
 			// Add extra information of the order here
 		}
 		return order;
-	}
-
-	@Timed
-	public List<Message> getDiscogsMessages(String id) throws IOException, InterruptedException {
-		return discogsClient.getDiscogsMessages(id).getMessages();
 	}
 
 	// Other
