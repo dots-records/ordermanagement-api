@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 
 @Document(collection = "Payments")
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class DatabasePayment {
 	@Id
 	private String id;

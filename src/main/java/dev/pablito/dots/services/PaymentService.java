@@ -1,16 +1,20 @@
 package dev.pablito.dots.services;
 
+import dev.pablito.dots.aop.Timed;
+import dev.pablito.dots.entity.DatabasePayment;
+import dev.pablito.dots.entity.PaymentRequest;
+import dev.pablito.dots.repository.PaymentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import dev.pablito.dots.entity.DatabasePayment;
-import dev.pablito.dots.entity.PaymentRequest;
-import dev.pablito.dots.repository.PaymentRepository;
+import java.util.Optional;
 
 @Service
 public class PaymentService {
@@ -41,4 +45,42 @@ public class PaymentService {
 		paymentRepository.save(payment);
 	}
 
+	public void deletePayment(String paymentId) {
+		paymentRepository.deleteById (paymentId);
+	}
+
+	public Optional<DatabasePayment> updatePaymentCost (String paymentId, Double cost) {
+		return paymentRepository.findById(paymentId).map(payment -> {
+			payment.setCost(cost);
+			return paymentRepository.save(payment);
+		});
+	}
+
+	public Optional<DatabasePayment> updatePaymentPayout (String paymentId, Double payout) {
+		return paymentRepository.findById(paymentId).map(payment -> {
+			payment.setPayout(payout);
+			return paymentRepository.save(payment);
+		});
+	}
+
+	public Optional<DatabasePayment> updatePaymentReason (String paymentId, String reason) {
+		return paymentRepository.findById(paymentId).map(payment -> {
+			payment.setReason(reason);
+			return paymentRepository.save(payment);
+		});
+	}
+
+	@Timed
+	public Page<DatabasePayment> getPayments(int page, int size) throws IOException, InterruptedException {
+		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
+		Page<DatabasePayment> paymentsPage = paymentRepository.findAll(pageable);
+		return paymentsPage;
+	}
+
+	@Timed
+	public Page<DatabasePayment> searchPayments(String term, int page, int size) throws IOException, InterruptedException {
+		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdComplete"));
+		Page<DatabasePayment> paymentsPage = paymentRepository.findBySearchTerm(term, pageable);
+		return paymentsPage;
+	}
 }

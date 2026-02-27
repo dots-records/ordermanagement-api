@@ -1,24 +1,19 @@
 package dev.pablito.dots.controller;
 
-import java.io.IOException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import dev.pablito.dots.aop.Timed;
 import dev.pablito.dots.entity.DatabasePayment;
 import dev.pablito.dots.entity.PaymentRequest;
 import dev.pablito.dots.services.PaymentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -63,6 +58,74 @@ public class PaymentController {
 			paymentService.createPayment(request);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] createListing({})", request, e);
+		}
+	}
+
+	@Timed
+	@DeleteMapping("/payments/{paymentId}")
+	public void deletePayment(@PathVariable String paymentId) {
+		try {
+			paymentService.deletePayment(paymentId);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] deletePayment({})", e);
+		}
+	}
+
+	@Timed
+	@PatchMapping("/payments/{paymentId}/cost")
+	public ResponseEntity<Void> patchPaymentCost(@PathVariable String paymentId, @RequestBody Map<String, Double> body) {
+		try {
+			Double cost = body.get("cost");
+			paymentService.updatePaymentCost(paymentId, cost);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] updatePaymentCost({})", paymentId, body, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	@Timed
+	@PatchMapping("/payments/{paymentId}/payout")
+	public ResponseEntity<Void> patchPaymentPayout(@PathVariable String paymentId, @RequestBody Map<String, Double> body) {
+		try {
+			Double payout = body.get("payout");
+			paymentService.updatePaymentPayout(paymentId, payout);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] updatePaymentPayout({})", paymentId, body, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	@Timed
+	@PatchMapping("/payments/{paymentId}/reason")
+	public ResponseEntity<Void> patchPaymentReason
+			(@PathVariable String paymentId, @RequestBody Map<String, Double> body) {
+		try {
+			Double cost = body.get("cost");
+			paymentService.updatePaymentCost(paymentId, cost);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] updatePaymentCost({})", paymentId, body, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	@Timed
+	@GetMapping("/payments")
+	public ResponseEntity<Page<DatabasePayment>> getPayments(@RequestParam(defaultValue = "0") int page,
+														 @RequestParam(defaultValue = "50") int size,
+														 @RequestParam(required = false) String search) {
+		try {
+			Page<DatabasePayment> response;
+			if (search == null) {
+				response = paymentService.getPayments(page, size);
+			} else {
+				response = paymentService.searchPayments(search, page, size);
+			}
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] getPayments({}, {}, {}, {}) ", page, size, search, e);
+			return ResponseEntity.noContent().build();
 		}
 	}
 
