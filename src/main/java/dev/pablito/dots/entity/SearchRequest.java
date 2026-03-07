@@ -10,6 +10,5 @@ public class SearchRequest {
 	public void setSearch(String search) {
 		this.search = search;
 	}
-	
-	
+
 }

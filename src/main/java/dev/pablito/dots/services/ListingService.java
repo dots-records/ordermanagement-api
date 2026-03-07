@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +18,8 @@ import dev.pablito.dots.api.discogs.DiscogsClient;
 import dev.pablito.dots.entity.DatabaseListing;
 import dev.pablito.dots.entity.DatabaseProvider;
 import dev.pablito.dots.entity.ListingRequest;
+import dev.pablito.dots.exceptions.DiscogsException;
+import dev.pablito.dots.exceptions.MongoException;
 import dev.pablito.dots.repository.ListingRepository;
 import dev.pablito.dots.repository.ProviderRepository;
 
@@ -31,8 +35,9 @@ public class ListingService {
 	private Double discogsRealBenefit = 0.85;
 
 	@Timed
+	@Transactional(rollbackFor = Exception.class)
 	public void createListing(long releaseId, String providerId, ListingRequest request)
-			throws IOException, InterruptedException {
+			throws MongoException, DiscogsException, IOException, InterruptedException {
 		DatabaseListing listing = new DatabaseListing(releaseId, providerId, request.getPlatform(), request.getLink(),
 				request.getSellingPrice());
 		if (listing.getPlatform().equals("Discogs")) {
@@ -57,7 +62,11 @@ public class ListingService {
 
 		}
 		listing.setDateLastEdition(LocalDateTime.now());
-		listingRepository.insert(listing);
+		try {
+			listingRepository.insert(listing);
+		} catch (DataAccessException e) {
+			throw new MongoException("Error saving listing in MongoDB: " + e.getMessage());
+		}
 	}
 
 	@Timed

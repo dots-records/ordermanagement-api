@@ -1,23 +1,14 @@
 package dev.pablito.dots.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 @Document(collection = "ordersInformation")
-@Data
-@AllArgsConstructor
 public class OrdersInfo {
 	@Id
 	private String id;
 	private String createdAfter;
-	
+
 	public OrdersInfo() {
 	}
 
@@ -36,8 +27,5 @@ public class OrdersInfo {
 	public void setCreatedAfter(String createdAfter) {
 		this.createdAfter = createdAfter;
 	}
-	
-	
-	
 
 }

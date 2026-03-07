@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import dev.pablito.dots.exceptions.DiscogsException;
+
 @Component
 public class DiscogsClient {
 	private static final String DISCOGS_API_URL = "https://api.discogs.com";
@@ -40,7 +42,6 @@ public class DiscogsClient {
 			waitingTime += 10000;
 		}
 		return response;
-
 	}
 
 	// Function: Get orders from Discogs
@@ -186,17 +187,14 @@ public class DiscogsClient {
 		};
 	}
 
-	// Mirar el request handler
 	public String createListing(long releaseId, double price, String discCondition, String sleeveCondition,
-			String comments) throws IOException, InterruptedException {
+			String comments) throws IOException, InterruptedException, DiscogsException {
 		if (releaseId <= 0) {
 			throw new IllegalArgumentException("El release_id es obligatorio y debe ser mayor a 0.");
 		}
 		if (price <= 0) {
 			throw new IllegalArgumentException("El precio (price) debe ser mayor a 0.");
 		}
-
-		String status = "For Sale";
 
 		// Crear el cuerpo de la solicitud como JSON
 		ObjectMapper mapper = new ObjectMapper();
@@ -206,7 +204,7 @@ public class DiscogsClient {
 		payload.put("condition", normalizeDiscogsCondition(discCondition));
 		payload.put("sleeve_condition", normalizeDiscogsCondition(sleeveCondition));
 		payload.put("comments", comments);
-		payload.put("status", status);
+		payload.put("status", "For Sale");
 
 		// Crear la solicitud HTTP
 		HttpClient client = HttpClient.newHttpClient();
@@ -215,13 +213,12 @@ public class DiscogsClient {
 				.uri(URI.create(DISCOGS_API_URL + "/marketplace/listings")).build();
 
 		HttpResponse<String> response = requestHandler(client, request);
-		// Enviar la solicitud y manejar la respuesta
 		if (response.statusCode() == 201) { // 201 Created
-			return response.body(); // Devuelve la respuesta en caso de éxito
+			return response.body();
 		} else {
 			System.out.println("[ERROR " + response.statusCode() + "]: No se pudo crear el listado.");
 			System.out.println(response.body());
-			return null;
+			throw new DiscogsException(response.body());
 		}
 	}
 

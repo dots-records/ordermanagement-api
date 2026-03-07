@@ -3,14 +3,7 @@ package dev.pablito.dots.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 @Document(collection = "Providers")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class DatabaseProvider {
 	@Id
 	private String id;

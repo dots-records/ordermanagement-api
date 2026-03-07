@@ -36,7 +36,7 @@ public class ListingsController {
 	@Timed
 	@PostMapping("/releases/{releaseId}/providers/{providerId}/listings")
 	public void createListing(@PathVariable Long releaseId, @PathVariable String providerId,
-			@RequestBody ListingRequest request) throws IOException, InterruptedException {
+			@RequestBody ListingRequest request) throws Exception {
 		try {
 			listingService.createListing(releaseId, providerId, request);
 		} catch (Exception e) {

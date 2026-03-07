@@ -5,14 +5,7 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 @Document(collection = "Orders")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class DatabaseOrder {
 	@Id
 	private String id;
