@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,7 +63,8 @@ public class ListingService {
 		listing.setDateLastEdition(LocalDateTime.now());
 		try {
 			listingRepository.insert(listing);
-		} catch (DataAccessException e) {
+			throw new Exception("Fallo en mongo");
+		} catch (Exception e) {
 			throw new MongoException("Error saving listing in MongoDB: " + e.getMessage());
 		}
 	}

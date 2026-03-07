@@ -35,12 +35,14 @@ public class ListingsController {
 
 	@Timed
 	@PostMapping("/releases/{releaseId}/providers/{providerId}/listings")
-	public void createListing(@PathVariable Long releaseId, @PathVariable String providerId,
-			@RequestBody ListingRequest request) throws Exception {
+	public ResponseEntity<?> createListing(@PathVariable Long releaseId, @PathVariable String providerId,
+			@RequestBody ListingRequest request) {
 		try {
 			listingService.createListing(releaseId, providerId, request);
+			return ResponseEntity.status(HttpStatus.CREATED).build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] createListing({} {})", releaseId, providerId, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
