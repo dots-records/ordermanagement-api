@@ -1,12 +1,10 @@
 package dev.pablito.dots.repository;
 
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import dev.pablito.dots.entity.DatabaseOrder;
 import dev.pablito.dots.entity.DatabaseRelease;
 
 public interface ReleaseRepository extends MongoRepository<DatabaseRelease, Long> {
@@ -14,21 +12,18 @@ public interface ReleaseRepository extends MongoRepository<DatabaseRelease, Long
 	@Query("{ '$or' : [ " + "{ 'title' : { $regex: ?0, $options: 'i' } }, "
 			+ "{ 'thumb' : { $regex: ?0, $options: 'i' } }, " + "{ 'artists.name' : { $regex: ?0, $options: 'i' } }, "
 			+ "{ 'formats.name' : { $regex: ?0, $options: 'i' } }, "
+			+ "{ 'formats.text': { $regex: ?0, $options: 'i' } }, "
 			+ "{ 'formats.descriptions' : { $regex: ?0, $options: 'i' } } " + "] }")
 	Page<DatabaseRelease> findBySearchTerm(String palabra, Pageable pageable);
-	
-	@Query("{ '$and': [ "
-	        + "{ 'archived': ?1 }, "
-	        + "{ '$or': [ "
-	            + "{ 'title': { $regex: ?0, $options: 'i' } }, "
-	            + "{ 'thumb': { $regex: ?0, $options: 'i' } }, "
-	            + "{ 'artists.name': { $regex: ?0, $options: 'i' } }, "
-	            + "{ 'formats.name': { $regex: ?0, $options: 'i' } }, "
-	            + "{ 'formats.descriptions': { $regex: ?0, $options: 'i' } } "
-	        + "] } "
-	    + "] }")
+
+	@Query("{ '$and': [ " + "{ 'archived': ?1 }, " + "{ '$or': [ " + "{ 'title': { $regex: ?0, $options: 'i' } }, "
+			+ "{ 'thumb': { $regex: ?0, $options: 'i' } }, " + "{ 'artists.name': { $regex: ?0, $options: 'i' } }, "
+			+ "{ 'formats.name': { $regex: ?0, $options: 'i' } }, "
+			+ "{ 'formats.text': { $regex: ?0, $options: 'i' } }, "
+			+ "{ 'formats.descriptions': { $regex: ?0, $options: 'i' } } " + "] } " + "] }")
 	Page<DatabaseRelease> findByArchivedAndSearchTerm(String palabra, boolean archived, Pageable pageable);
 
-	
 	Page<DatabaseRelease> findByArchived(boolean archived, Pageable pageable);
+
+	long countByArchived(boolean archived);
 }

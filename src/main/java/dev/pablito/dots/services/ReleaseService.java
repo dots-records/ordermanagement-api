@@ -1,13 +1,16 @@
 package dev.pablito.dots.services;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import dev.pablito.dots.aop.Timed;
@@ -26,6 +29,33 @@ public class ReleaseService {
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseService.class);
 
 	@Timed
+	public Page<DatabaseRelease> getReleases(int page, int size) throws IOException, InterruptedException {
+		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateLastEdition"));
+		Page<DatabaseRelease> releasePage = releaseRepository.findAll(pageable);
+		return releasePage;
+	}
+
+	@Timed
+	public Page<DatabaseRelease> getReleasesByArchived(int page, int size, boolean archived)
+			throws IOException, InterruptedException {
+		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateLastEdition"));
+		Page<DatabaseRelease> releasePage = releaseRepository.findByArchived(archived, pageable);
+		return releasePage;
+	}
+
+	@Timed
+	public Page<DatabaseRelease> searchReleases(String search, int page, int size) {
+		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateLastEdition"));
+		return releaseRepository.findBySearchTerm(search, pageable);
+	}
+
+	@Timed
+	public Page<DatabaseRelease> searchReleasesByArchived(String palabra, int page, int size, boolean archived) {
+		PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateLastEdition"));
+		return releaseRepository.findByArchivedAndSearchTerm(palabra, archived, pageable);
+	}
+
+	@Timed
 	public DiscogsRelease getReleaseFromDiscogs(Long id) throws IOException, InterruptedException {
 		return discogsClient.getRelease(id);
 	}
@@ -33,39 +63,6 @@ public class ReleaseService {
 	@Timed
 	public void postRelease(DatabaseRelease release) {
 		releaseRepository.insert(release);
-	}
-
-	@Timed
-	public Page<DatabaseRelease> getAllReleases(int page, int size) throws IOException, InterruptedException {
-		PageRequest pageable = PageRequest.of(page, size);
-		Page<DatabaseRelease> releasePage = releaseRepository.findAll(pageable);
-		return releasePage;
-	}
-
-	@Timed
-	public Page<DatabaseRelease> getArchivedReleases(int page, int size) throws IOException, InterruptedException {
-		PageRequest pageable = PageRequest.of(page, size);
-		Page<DatabaseRelease> releasePage = releaseRepository.findByArchived(true, pageable);
-		return releasePage;
-	}
-
-	@Timed
-	public Page<DatabaseRelease> getUnarchivedReleases(int page, int size) throws IOException, InterruptedException {
-		PageRequest pageable = PageRequest.of(page, size);
-		Page<DatabaseRelease> releasePage = releaseRepository.findByArchived(false, pageable);
-		return releasePage;
-	}
-
-	@Timed
-	public Page<DatabaseRelease> searchReleases(String palabra, int page, int size) {
-		PageRequest pageable = PageRequest.of(page, size);
-		return releaseRepository.findBySearchTerm(palabra, pageable);
-	}
-
-	@Timed
-	public Page<DatabaseRelease> searchReleasesByArchived(String palabra, int page, int size, boolean archived) {
-		PageRequest pageable = PageRequest.of(page, size);
-		return releaseRepository.findByArchivedAndSearchTerm(palabra, archived, pageable);
 	}
 
 	@Timed
@@ -79,25 +76,32 @@ public class ReleaseService {
 	}
 
 	@Timed
-	public void archiveReleases(List<Long> ids) {
+	public void updateArchived(List<Long> ids, boolean archived) {
 		List<DatabaseRelease> releases = releaseRepository.findAllById(ids);
 		for (DatabaseRelease release : releases) {
-			release.setArchived(true);
-		}
-		releaseRepository.saveAll(releases);
-	}
-
-	@Timed
-	public void unarchiveReleases(List<Long> ids) {
-		List<DatabaseRelease> releases = releaseRepository.findAllById(ids);
-		for (DatabaseRelease release : releases) {
-			release.setArchived(false);
+			release.setArchived(archived);
+			release.setDateLastEdition(LocalDateTime.now());
 		}
 		releaseRepository.saveAll(releases);
 	}
 
 	public boolean contains(Long id) {
 		return releaseRepository.existsById(id);
+	}
+
+	public long countAllReleases() {
+		return releaseRepository.count();
+	}
+
+	public long countReleasesByArchived(boolean archived) {
+		return releaseRepository.countByArchived(archived);
+	}
+
+	public Optional<DatabaseRelease> updateReleaseNote(Long id, String note) {
+		return releaseRepository.findById(id).map(release -> {
+			release.setNote(note);
+			return releaseRepository.save(release);
+		});
 	}
 
 }

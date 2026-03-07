@@ -16,7 +16,7 @@ public class DiscogsRelease {
 	private List<Artist> artists;
 	private List<Format> formats;
 	private List<Image> images;
-	
+	private String uri;
 
 	public Long getId() {
 		return id;
@@ -65,7 +65,13 @@ public class DiscogsRelease {
 	public void setImages(List<Image> images) {
 		this.images = images;
 	}
-	
-	
-	
+
+	public String getUri() {
+		return uri;
+	}
+
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
+
 }
