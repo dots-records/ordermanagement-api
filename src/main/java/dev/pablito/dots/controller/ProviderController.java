@@ -37,44 +37,46 @@ public class ProviderController {
 
 	@Timed
 	@PostMapping("/releases/{releaseId}/providers")
-	public void createProvider(@PathVariable Long releaseId, @RequestBody ProviderRequest request)
+	public ResponseEntity<?> createProvider(@PathVariable Long releaseId, @RequestBody ProviderRequest request)
 			throws IOException, InterruptedException {
 		try {
 			providerService.createProvider(releaseId, request);
+			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] createProvider({} {})", releaseId, request.toString(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@GetMapping("/releases/{releaseId}/providers")
-	public ResponseEntity<List<DatabaseProvider>> getProviders(@PathVariable Long releaseId)
+	public ResponseEntity<?> getProviders(@PathVariable Long releaseId)
 			throws IOException, InterruptedException {
 		try {
 			List<DatabaseProvider> response = providerService.getProviders(releaseId);
 			return new ResponseEntity<List<DatabaseProvider>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] getProviders({})", releaseId, e);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PutMapping("/releases/{releaseId}/providers/{providerId}")
-	public ResponseEntity<Void> updateProvider(@PathVariable Long releaseId, @PathVariable String providerId,
+	public ResponseEntity<?> updateProvider(@PathVariable Long releaseId, @PathVariable String providerId,
 			@RequestBody ProviderRequest request) {
 		try {
 			providerService.updateProvider(releaseId, providerId, request);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] updateProvider({}, {}, {})", releaseId, providerId, request.toString(), e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/releases/{releaseId}/providers/{providerId}/units")
-	public ResponseEntity<Void> patchProviderUnits(@PathVariable Long releaseId, @PathVariable String providerId,
+	public ResponseEntity<?> patchProviderUnits(@PathVariable Long releaseId, @PathVariable String providerId,
 			@RequestBody Map<String, Integer> body) {
 		try {
 			Integer units = body.get("units");
@@ -82,19 +84,19 @@ public class ProviderController {
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] updateProviderUnits({}, {}, {})", releaseId, providerId, body, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@DeleteMapping("/releases/{releaseId}/providers/{providerId}")
-	public ResponseEntity<Void> deleteProvider(@PathVariable Long releaseId, @PathVariable String providerId) {
+	public ResponseEntity<?> deleteProvider(@PathVariable Long releaseId, @PathVariable String providerId) {
 		try {
 			providerService.deleteProvider(releaseId, providerId);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] deleteProvider({}, {})", releaseId, providerId, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 

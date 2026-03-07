@@ -37,19 +37,19 @@ public class OrderController {
 	// Gets order identified by id from database "Orders"
 	@Timed
 	@GetMapping("/orders/{id}")
-	public ResponseEntity<DatabaseOrder> getOrder(@PathVariable String id) throws IOException, InterruptedException {
+	public ResponseEntity<?> getOrder(@PathVariable String id) throws IOException, InterruptedException {
 		try {
 			DatabaseOrder response = orderService.getOrder(id);
 			return new ResponseEntity<DatabaseOrder>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] getOrder({})", id, e);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@GetMapping("/orders")
-	public ResponseEntity<Page<DatabaseOrder>> getOrders(@RequestParam(defaultValue = "0") int page,
+	public ResponseEntity<?> getOrders(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "50") int size, @RequestParam(required = false) Boolean archived,
 			@RequestParam(required = false) String search) {
 		try {
@@ -71,23 +71,25 @@ public class OrderController {
 			return new ResponseEntity<Page<DatabaseOrder>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] getOrders({}, {}, {}, {}) ", page, size, archived, search, e);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PostMapping("/orders")
-	public void createOrder(@RequestBody OrderRequest request) {
+	public ResponseEntity<?> createOrder(@RequestBody OrderRequest request) {
 		try {
 			orderService.createOrder(request);
+			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] getOrders({}, {}, {}, {}) ");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/orders/{id}/status")
-	public ResponseEntity<Void> patchOrderStatus(@PathVariable String id, @RequestBody Map<String, String> body) {
+	public ResponseEntity<?> patchOrderStatus(@PathVariable String id, @RequestBody Map<String, String> body) {
 		try {
 			String status = body.get("status");
 			orderService.updateOrderStatusInDatabase(id, status);
@@ -96,26 +98,26 @@ public class OrderController {
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderStatus({}, body={})", id, body, e);
-			return ResponseEntity.internalServerError().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/orders/{id}/paymentId")
-	public ResponseEntity<Void> patchOrderPaymentId(@PathVariable String id, @RequestBody Map<String, String> body) {
+	public ResponseEntity<?> patchOrderPaymentId(@PathVariable String id, @RequestBody Map<String, String> body) {
 		try {
 			String paymentId = body.get("paymentId");
 			orderService.updateOrderPaymentId(id, paymentId);
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderStatus({}, body={})", id, body, e);
-			return ResponseEntity.internalServerError().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/orders/{id}/justAdded")
-	public ResponseEntity<Void> patchOrderJustAdded(@PathVariable String id, @RequestBody Map<String, String> body) {
+	public ResponseEntity<?> patchOrderJustAdded(@PathVariable String id, @RequestBody Map<String, String> body) {
 		try {
 			String justAddedStr = body.get("justAdded");
 
@@ -128,43 +130,43 @@ public class OrderController {
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderJustAdded({}, body={})", id, body, e);
-			return ResponseEntity.internalServerError().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/orders/{id}/warning")
-	public ResponseEntity<Void> patchOrderWarning(@PathVariable String id, @RequestBody Map<String, String> body) {
+	public ResponseEntity<?> patchOrderWarning(@PathVariable String id, @RequestBody Map<String, String> body) {
 		try {
 			String warning = body.get("warning");
 			orderService.updateOrderWarning(id, warning);
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderWarning({}, body={})", id, body, e);
-			return ResponseEntity.internalServerError().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/orders/{id}/information")
-	public ResponseEntity<Void> patchOrderInformation(@PathVariable String id, @RequestBody Map<String, String> body) {
+	public ResponseEntity<?> patchOrderInformation(@PathVariable String id, @RequestBody Map<String, String> body) {
 		try {
 			String information = body.get("information");
 			orderService.updateOrderInformation(id, information);
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderInformation({}, body={})", id, body, e);
-			return ResponseEntity.internalServerError().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/orders/{id}/items")
-	public ResponseEntity<Void> patchOrderItems(@PathVariable String id, @RequestBody Map<String, String> body) {
+	public ResponseEntity<?> patchOrderItems(@PathVariable String id, @RequestBody Map<String, String> body) {
 		try {
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderItems({}, body={})", id, body, e);
-			return ResponseEntity.internalServerError().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 		return null;
 	}

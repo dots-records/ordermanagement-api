@@ -30,47 +30,46 @@ public class ItemController {
 
 	@Timed
 	@PatchMapping("/orders/{orderId}/items/{itemId}/listing")
-	public ResponseEntity<Void> patchOrderItemListing(@PathVariable String orderId, @PathVariable String itemId,
+	public ResponseEntity<?> patchOrderItemListing(@PathVariable String orderId, @PathVariable String itemId,
 			@RequestBody ListingItemRequest request) {
 		try {
 			itemService.updateListingItem(orderId, itemId, request);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderItemListing({}, {}, {}, {})", orderId, itemId, request, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/orders/{orderId}/items/{itemId}/provider")
-	public ResponseEntity<Void> patchOrderItemProvider(@PathVariable String orderId, @PathVariable String itemId,
+	public ResponseEntity<?> patchOrderItemProvider(@PathVariable String orderId, @PathVariable String itemId,
 			@RequestBody ProviderItemRequest request) {
 		try {
 			itemService.updateProviderItem(orderId, itemId, request);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderItemProvider({}, {}, {}, {})", orderId, itemId, request, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/orders/{orderId}/items/{itemId}/release")
-	public ResponseEntity<Void> patchOrderItemRelease(@PathVariable String orderId, @PathVariable String itemId,
+	public ResponseEntity<?> patchOrderItemRelease(@PathVariable String orderId, @PathVariable String itemId,
 			@RequestBody ReleaseItemRequest request) {
 		try {
-
 			itemService.updateReleaseItem(orderId, itemId, request);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderItemRelease({}, {}, {}, {})", orderId, itemId, request, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/orders/{orderId}/items/{itemId}/associated")
-	public ResponseEntity<Void> patchOrderItemAssociated(@PathVariable String orderId, @PathVariable String itemId,
+	public ResponseEntity<?> patchOrderItemAssociated(@PathVariable String orderId, @PathVariable String itemId,
 			@RequestBody Map<String, Boolean> body) {
 		try {
 			Boolean associated = body.get("associated");
@@ -78,7 +77,7 @@ public class ItemController {
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderItemAssociated({}, {}, {}, {})", orderId, itemId, body, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 

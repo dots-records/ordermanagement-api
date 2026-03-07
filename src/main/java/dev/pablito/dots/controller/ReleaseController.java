@@ -41,7 +41,7 @@ public class ReleaseController {
 
 	@Timed
 	@GetMapping("/releases")
-	public ResponseEntity<Page<DatabaseRelease>> getReleases(@RequestParam(defaultValue = "0") int page,
+	public ResponseEntity<?> getReleases(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "50") int size, @RequestParam(required = false) Boolean archived,
 			@RequestParam(required = false) String search) {
 		try {
@@ -62,13 +62,13 @@ public class ReleaseController {
 			return new ResponseEntity<Page<DatabaseRelease>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] getReleases({}, {}, {}, {}) ", page, size, archived, search, e);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PostMapping("/releases")
-	public void createRelease(@RequestBody ReleaseRequest request) throws IOException, InterruptedException {
+	public ResponseEntity<?> createRelease(@RequestBody ReleaseRequest request) throws IOException, InterruptedException {
 		try {
 			Long id = request.getDiscogsId();
 			if (!releaseService.contains(id)) {
@@ -78,55 +78,58 @@ public class ReleaseController {
 					releaseService.postRelease(mapper.mapToDatabaseRelease(discogsRelease));
 				}
 			}
+			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] createRelease({})", request.getDiscogsId(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	// Gets release identified by "id" from database "Releases"
 	@Timed
 	@GetMapping("/releases/{id}")
-	public ResponseEntity<DatabaseRelease> getRelease(@PathVariable Long id) throws IOException, InterruptedException {
+	public ResponseEntity<?> getRelease(@PathVariable Long id) throws IOException, InterruptedException {
 		try {
 			DatabaseRelease response = releaseService.getRelease(id);
 
 			if (response == null) {
 				return ResponseEntity.notFound().build();
 			}
-
 			return new ResponseEntity<DatabaseRelease>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] getRelease({})", id, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@DeleteMapping("/releases")
-	public void deleteReleases(@RequestBody List<Long> ids) {
+	public ResponseEntity<?> deleteReleases(@RequestBody List<Long> ids) {
 		try {
 			releaseService.deleteReleases(ids);
+			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] deleteReleases({})", ids, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 
 	}
 
 	@Timed
 	@PatchMapping("/releases/archived")
-	public ResponseEntity<Void> updateArchived(@RequestBody ArchiveRequest request) {
+	public ResponseEntity<?> updateArchived(@RequestBody ArchiveRequest request) {
 		try {
 			releaseService.updateArchived(request.getIds(), request.isArchived());
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] updateArchived({})", request, e);
-			return ResponseEntity.internalServerError().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@GetMapping("/releases/count")
-	public ResponseEntity<Long> countReleases(@RequestParam(required = false) Boolean archived) {
+	public ResponseEntity<?> countReleases(@RequestParam(required = false) Boolean archived) {
 		try {
 			long count;
 			if (archived == null) {
@@ -137,20 +140,20 @@ public class ReleaseController {
 			return new ResponseEntity<>(count, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] countReleases({})", archived, e);
-			return ResponseEntity.internalServerError().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/releases/{id}/note")
-	public ResponseEntity<Void> patchReleaseNote(@PathVariable Long id, @RequestBody Map<String, String> body) {
+	public ResponseEntity<?> patchReleaseNote(@PathVariable Long id, @RequestBody Map<String, String> body) {
 		try {
 			String note = body.get("note");
 			releaseService.updateReleaseNote(id, note);
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchReleaseNote({}, body={})", id, body, e);
-			return ResponseEntity.internalServerError().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 

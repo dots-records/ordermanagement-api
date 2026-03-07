@@ -292,7 +292,7 @@ public class DiscogsClient {
 		}
 	}
 
-	public String deleteDiscogsListing(Long id) throws IOException, InterruptedException {
+	public void deleteDiscogsListing(Long id) throws IOException, InterruptedException, DiscogsException {
 		if (id == null || id <= 0) {
 			throw new IllegalArgumentException("El listing_id es obligatorio y debe ser mayor a 0.");
 		}
@@ -304,12 +304,10 @@ public class DiscogsClient {
 
 		HttpResponse<String> response = requestHandler(client, request);
 
-		if (response.statusCode() == 204) { // 204 No Content = borrado correcto
-			return "Listing eliminado correctamente en Discogs";
-		} else {
+		if (response.statusCode() != 204) { // 204 No Content = borrado correcto
 			System.out.println("[ERROR " + response.statusCode() + "]: Trying to delete listing " + id);
 			System.out.println(response.body());
-			return null;
+			throw new DiscogsException(response.body());
 		}
 	}
 

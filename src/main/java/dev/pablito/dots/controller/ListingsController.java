@@ -36,10 +36,10 @@ public class ListingsController {
 	@Timed
 	@PostMapping("/releases/{releaseId}/providers/{providerId}/listings")
 	public ResponseEntity<?> createListing(@PathVariable Long releaseId, @PathVariable String providerId,
-			@RequestBody ListingRequest request) {
+			@RequestBody ListingRequest request) throws Exception {
 		try {
 			listingService.createListing(releaseId, providerId, request);
-			return ResponseEntity.status(HttpStatus.CREATED).build();
+			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] createListing({} {})", releaseId, providerId, e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -48,7 +48,7 @@ public class ListingsController {
 
 	@Timed
 	@PatchMapping("/releases/{releaseId}/providers/{providerId}/listings/{listingId}/sellingPrice")
-	public ResponseEntity<Void> patchListingSellingPrice(@PathVariable Long releaseId, @PathVariable String providerId,
+	public ResponseEntity<?> patchListingSellingPrice(@PathVariable Long releaseId, @PathVariable String providerId,
 			@PathVariable String listingId, @RequestBody Map<String, Double> body) {
 		try {
 			Double newSellingPrice = body.get("sellingPrice");
@@ -57,13 +57,13 @@ public class ListingsController {
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchListingSellingPrice({}, {}, {}, {})", releaseId, providerId, listingId,
 					body, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PatchMapping("/releases/{releaseId}/providers/{providerId}/listings/{listingId}/link")
-	public ResponseEntity<Void> patchListingLink(@PathVariable Long releaseId, @PathVariable String providerId,
+	public ResponseEntity<?> patchListingLink(@PathVariable Long releaseId, @PathVariable String providerId,
 			@PathVariable String listingId, @RequestBody Map<String, String> body) {
 		try {
 			String newLink = body.get("link");
@@ -71,33 +71,33 @@ public class ListingsController {
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchListingLink({}, {}, {}, {})", releaseId, providerId, listingId, body, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@GetMapping("/releases/{releaseId}/providers/{providerId}/listings")
-	public ResponseEntity<List<DatabaseListing>> getListings(@PathVariable Long releaseId,
+	public ResponseEntity<?> getListings(@PathVariable Long releaseId,
 			@PathVariable String providerId) throws IOException, InterruptedException {
 		try {
 			List<DatabaseListing> response = listingService.getListings(releaseId, providerId);
 			return new ResponseEntity<List<DatabaseListing>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] getListings({} {})", releaseId, providerId, e);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@DeleteMapping("/releases/{releaseId}/providers/{providerId}/listings/{listingId}")
-	public ResponseEntity<Void> deleteListing(@PathVariable Long releaseId, @PathVariable String providerId,
+	public ResponseEntity<?> deleteListing(@PathVariable Long releaseId, @PathVariable String providerId,
 			@PathVariable String listingId) {
 		try {
 			listingService.deleteListing(releaseId, providerId, listingId);
 			return ResponseEntity.noContent().build(); // 204
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] deleteListing({}, {}, {})", releaseId, providerId, listingId, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 

@@ -63,8 +63,10 @@ public class ListingService {
 		listing.setDateLastEdition(LocalDateTime.now());
 		try {
 			listingRepository.insert(listing);
-			throw new Exception("Fallo en mongo");
 		} catch (Exception e) {
+			if (listing.getPlatform().equals("Discogs")) {
+				discogsClient.deleteDiscogsListing(listing.getDiscogsListingId());
+			}
 			throw new MongoException("Error saving listing in MongoDB: " + e.getMessage());
 		}
 	}
@@ -111,7 +113,7 @@ public class ListingService {
 
 	@Timed
 	public void deleteListing(long releaseId, String providerId, String listingId)
-			throws IOException, InterruptedException {
+			throws IOException, InterruptedException, DiscogsException {
 
 		Optional<DatabaseListing> optListing = listingRepository.findByIdAndReleaseIdAndProviderId(listingId, releaseId,
 				providerId);
