@@ -142,4 +142,15 @@ public class ProviderService {
 
 	}
 
+	@Timed
+	public Boolean existsProvider(long releaseId, String providerId)
+			throws IOException, InterruptedException, NotFoundException {
+		if (!releaseRepository.existsById(releaseId)) {
+			throw new NotFoundException("Problem finding the release associated with this provider");
+		}
+		Optional<DatabaseProvider> optProvider = providerRepository.findByIdAndReleaseId(providerId, releaseId);
+
+		return optProvider.isPresent();
+	}
+
 }

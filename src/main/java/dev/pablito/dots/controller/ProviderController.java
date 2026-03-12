@@ -97,4 +97,16 @@ public class ProviderController {
 		}
 	}
 
+	@Timed
+	@GetMapping("/releases/{releaseId}/providers/{providerId}/exists")
+	public ResponseEntity<?> getExistsProvider(@PathVariable Long releaseId, @PathVariable String providerId) {
+		try {
+			Boolean response = providerService.existsProvider(releaseId, providerId);
+			return new ResponseEntity<Boolean>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] getExistsProvider({} {})", releaseId, providerId, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+
 }

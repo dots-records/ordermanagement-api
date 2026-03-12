@@ -100,7 +100,7 @@ public class ListingsController {
 	}
 
 	@Timed
-	@GetMapping("/releases/{releaseId}/providers/{providerId}/listings/{listingId}")
+	@GetMapping("/releases/{releaseId}/providers/{providerId}/listings/{listingId}/exists")
 	public ResponseEntity<?> getExistsListing(@PathVariable Long releaseId, @PathVariable String providerId,
 			@PathVariable String listingId) {
 		try {
