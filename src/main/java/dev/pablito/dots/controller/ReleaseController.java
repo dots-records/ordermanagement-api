@@ -22,11 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.pablito.dots.aop.Timed;
-import dev.pablito.dots.api.discogs.DiscogsRelease;
 import dev.pablito.dots.entity.ArchiveRequest;
 import dev.pablito.dots.entity.DatabaseRelease;
 import dev.pablito.dots.entity.ReleaseRequest;
-import dev.pablito.dots.mapper.ReleaseMapper;
 import dev.pablito.dots.services.ReleaseService;
 
 @RestController
@@ -68,16 +66,9 @@ public class ReleaseController {
 
 	@Timed
 	@PostMapping("/releases")
-	public ResponseEntity<?> createRelease(@RequestBody ReleaseRequest request) throws IOException, InterruptedException {
+	public ResponseEntity<?> createRelease(@RequestBody ReleaseRequest request) {
 		try {
-			Long id = request.getDiscogsId();
-			if (!releaseService.contains(id)) {
-				DiscogsRelease discogsRelease = releaseService.getReleaseFromDiscogs(id);
-				if (discogsRelease != null) {
-					ReleaseMapper mapper = new ReleaseMapper();
-					releaseService.postRelease(mapper.mapToDatabaseRelease(discogsRelease));
-				}
-			}
+			releaseService.createReleaseFromDiscogs(request);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] createRelease({})", request.getDiscogsId(), e);
@@ -91,10 +82,6 @@ public class ReleaseController {
 	public ResponseEntity<?> getRelease(@PathVariable Long id) throws IOException, InterruptedException {
 		try {
 			DatabaseRelease response = releaseService.getRelease(id);
-
-			if (response == null) {
-				return ResponseEntity.notFound().build();
-			}
 			return new ResponseEntity<DatabaseRelease>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] getRelease({})", id, e);

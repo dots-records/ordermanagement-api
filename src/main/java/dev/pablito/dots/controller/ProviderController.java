@@ -1,6 +1,5 @@
 package dev.pablito.dots.controller;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -37,8 +36,7 @@ public class ProviderController {
 
 	@Timed
 	@PostMapping("/releases/{releaseId}/providers")
-	public ResponseEntity<?> createProvider(@PathVariable Long releaseId, @RequestBody ProviderRequest request)
-			throws IOException, InterruptedException {
+	public ResponseEntity<?> createProvider(@PathVariable Long releaseId, @RequestBody ProviderRequest request) {
 		try {
 			providerService.createProvider(releaseId, request);
 			return ResponseEntity.ok().build();
@@ -50,8 +48,7 @@ public class ProviderController {
 
 	@Timed
 	@GetMapping("/releases/{releaseId}/providers")
-	public ResponseEntity<?> getProviders(@PathVariable Long releaseId)
-			throws IOException, InterruptedException {
+	public ResponseEntity<?> getProviders(@PathVariable Long releaseId) {
 		try {
 			List<DatabaseProvider> response = providerService.getProviders(releaseId);
 			return new ResponseEntity<List<DatabaseProvider>>(response, HttpStatus.OK);

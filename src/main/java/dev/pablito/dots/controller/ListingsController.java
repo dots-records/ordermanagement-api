@@ -1,6 +1,5 @@
 package dev.pablito.dots.controller;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +35,7 @@ public class ListingsController {
 	@Timed
 	@PostMapping("/releases/{releaseId}/providers/{providerId}/listings")
 	public ResponseEntity<?> createListing(@PathVariable Long releaseId, @PathVariable String providerId,
-			@RequestBody ListingRequest request) throws Exception {
+			@RequestBody ListingRequest request) {
 		try {
 			listingService.createListing(releaseId, providerId, request);
 			return ResponseEntity.ok().build();
@@ -77,8 +76,7 @@ public class ListingsController {
 
 	@Timed
 	@GetMapping("/releases/{releaseId}/providers/{providerId}/listings")
-	public ResponseEntity<?> getListings(@PathVariable Long releaseId,
-			@PathVariable String providerId) throws IOException, InterruptedException {
+	public ResponseEntity<?> getListings(@PathVariable Long releaseId, @PathVariable String providerId) {
 		try {
 			List<DatabaseListing> response = listingService.getListings(releaseId, providerId);
 			return new ResponseEntity<List<DatabaseListing>>(response, HttpStatus.OK);
@@ -97,6 +95,19 @@ public class ListingsController {
 			return ResponseEntity.noContent().build(); // 204
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] deleteListing({}, {}, {})", releaseId, providerId, listingId, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+
+	@Timed
+	@GetMapping("/releases/{releaseId}/providers/{providerId}/listings/{listingId}")
+	public ResponseEntity<?> getExistsListing(@PathVariable Long releaseId, @PathVariable String providerId,
+			@PathVariable String listingId) {
+		try {
+			Boolean response = listingService.existsListing(releaseId, providerId, listingId);
+			return new ResponseEntity<Boolean>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] getExistsListing({} {})", releaseId, providerId, e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}

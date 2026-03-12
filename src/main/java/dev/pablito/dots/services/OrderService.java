@@ -24,6 +24,10 @@ import dev.pablito.dots.api.discogs.DiscogsOrder;
 import dev.pablito.dots.entity.DatabaseOrder;
 import dev.pablito.dots.entity.OrderRequest;
 import dev.pablito.dots.entity.OrdersInfo;
+import dev.pablito.dots.exceptions.DiscogsException;
+import dev.pablito.dots.exceptions.InvalidException;
+import dev.pablito.dots.exceptions.MongoException;
+import dev.pablito.dots.exceptions.NotFoundException;
 import dev.pablito.dots.mapper.OrderMapper;
 import dev.pablito.dots.repository.ListingRepository;
 import dev.pablito.dots.repository.OrderRepository;
@@ -87,13 +91,28 @@ public class OrderService {
 	}
 
 	@Timed
-	public Optional<DatabaseOrder> updateOrderStatusInDatabase(String id, String new_status) {
-		return orderRepository.findById(id).map(order -> {
-			// Actualizar el estado del pedido
+	@Transactional(rollbackFor = Exception.class)
+	public void updateOrderStatus(String id, String new_status) throws MongoException, NotFoundException, IOException,
+			InterruptedException, DiscogsException, InvalidException {
+		Optional<DatabaseOrder> optOrder = orderRepository.findOrderById(id);
+		if (optOrder.isPresent()) {
+			DatabaseOrder order = optOrder.get();
 			order.setStatus(new_status);
-			// Guardar el documento actualizado
-			return orderRepository.save(order);
-		});
+			try {
+				orderRepository.save(order);
+			} catch (Exception e) {
+				throw new MongoException("Error saving status of order in MongoDB: " + e.getMessage());
+			}
+			if ("Discogs".equals(order.getPlatform())) {
+				if (order.getDiscogsId() != null) {
+					discogsClient.updateOrderStatus(order.getDiscogsId(), new_status);
+				} else {
+					throw new InvalidException("Problem with the id of this order in Discogs");
+				}
+			}
+		} else {
+			throw new NotFoundException("Order not found");
+		}
 	}
 
 	@Timed
@@ -124,35 +143,60 @@ public class OrderService {
 	}
 
 	@Timed
-	public DiscogsOrder updateOrderStatusInDiscogs(String id, String new_status)
-			throws IOException, InterruptedException {
-		return discogsClient.updateOrderStatus(id, new_status);
-	}
-
-	@Timed
-	public Optional<DatabaseOrder> updateOrderWarning(String id, String warning) {
-		return orderRepository.findById(id).map(order -> {
-			// Actualizar el estado del pedido
+	@Transactional(rollbackFor = Exception.class)
+	public void updateOrderWarning(String id, String warning) throws MongoException, NotFoundException {
+		Optional<DatabaseOrder> optOrder = orderRepository.findOrderById(id);
+		if (optOrder.isPresent()) {
+			DatabaseOrder order = optOrder.get();
 			order.setWarning(warning);
-			return orderRepository.save(order);
-		});
+			try {
+				orderRepository.save(order);
+			} catch (Exception e) {
+				throw new MongoException("Error updating warning of order in MongoDB: " + e.getMessage());
+			}
+		} else {
+			throw new NotFoundException("Order not found");
+		}
 	}
 
 	@Timed
-	public Optional<DatabaseOrder> updateOrderInformation(String id, String information) {
-		return orderRepository.findById(id).map(order -> {
+	@Transactional(rollbackFor = Exception.class)
+	public void updateOrderInformation(String id, String information) throws MongoException, NotFoundException {
+		Optional<DatabaseOrder> optOrder = orderRepository.findOrderById(id);
+		if (optOrder.isPresent()) {
+			DatabaseOrder order = optOrder.get();
 			order.setInformation(information);
-			return orderRepository.save(order);
-		});
+			try {
+				orderRepository.save(order);
+			} catch (Exception e) {
+				throw new MongoException("Error updating information of order in MongoDB: " + e.getMessage());
+			}
+		} else {
+			throw new NotFoundException("Order not found");
+		}
 	}
 
 	@Timed
-	public Optional<DatabaseOrder> updateOrderJustAdded(String id, Boolean justAdded) {
-		return orderRepository.findById(id).map(order -> {
-			// Actualizar el estado del pedido
+	@Transactional(rollbackFor = Exception.class)
+	public void updateOrderJustAdded(String id, String justAddedStr)
+			throws MongoException, NotFoundException, InvalidException {
+		if (justAddedStr == null
+				|| (!justAddedStr.equalsIgnoreCase("true") && !justAddedStr.equalsIgnoreCase("false"))) {
+			throw new InvalidException("Invalid format");
+		}
+		boolean justAdded = Boolean.parseBoolean(justAddedStr);
+		Optional<DatabaseOrder> optOrder = orderRepository.findOrderById(id);
+		if (optOrder.isPresent()) {
+			DatabaseOrder order = optOrder.get();
 			order.setJustAdded(justAdded);
-			return orderRepository.save(order);
-		});
+			try {
+				orderRepository.save(order);
+			} catch (Exception e) {
+				throw new MongoException("Error updating justAdd of order in MongoDB: " + e.getMessage());
+			}
+		} else {
+			throw new NotFoundException("Order not found");
+		}
 	}
 
 	@Timed
@@ -221,13 +265,13 @@ public class OrderService {
 				throw new RuntimeException("Error al convertir DiscogsOrder", e);
 			}
 		}).toList();
-		saveOrdersAndUpdateInfo(dbOrders, info);
+		saveOrdersAndUpdateInfo(dbOrders);
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	protected void saveOrdersAndUpdateInfo(List<DatabaseOrder> dbOrders, OrdersInfo oldInfo) {
+	protected void saveOrdersAndUpdateInfo(List<DatabaseOrder> dbOrders) {
 		orderRepository.saveAll(dbOrders);
-		ordersInfoRepository.delete(oldInfo); // elimina el OrdersInfo antiguo
+		ordersInfoRepository.deleteAll(); // elimina el OrdersInfo antiguo
 
 		OrdersInfo new_info = new OrdersInfo();
 		new_info.setCreatedAfter(getActualDate());

@@ -92,9 +92,7 @@ public class OrderController {
 	public ResponseEntity<?> patchOrderStatus(@PathVariable String id, @RequestBody Map<String, String> body) {
 		try {
 			String status = body.get("status");
-			orderService.updateOrderStatusInDatabase(id, status);
-			DatabaseOrder dbOrder = orderService.getOrder(id);
-			orderService.updateOrderStatusInDiscogs(dbOrder.getDiscogsId(), status);
+			orderService.updateOrderStatus(id, status);
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderStatus({}, body={})", id, body, e);
@@ -120,13 +118,7 @@ public class OrderController {
 	public ResponseEntity<?> patchOrderJustAdded(@PathVariable String id, @RequestBody Map<String, String> body) {
 		try {
 			String justAddedStr = body.get("justAdded");
-
-			if (justAddedStr == null
-					|| (!justAddedStr.equalsIgnoreCase("true") && !justAddedStr.equalsIgnoreCase("false"))) {
-				return ResponseEntity.badRequest().body(null);
-			}
-			boolean justAdded = Boolean.parseBoolean(justAddedStr);
-			orderService.updateOrderJustAdded(id, justAdded);
+			orderService.updateOrderJustAdded(id, justAddedStr);
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] patchOrderJustAdded({}, body={})", id, body, e);

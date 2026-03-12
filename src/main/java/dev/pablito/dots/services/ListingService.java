@@ -19,8 +19,10 @@ import dev.pablito.dots.entity.DatabaseProvider;
 import dev.pablito.dots.entity.ListingRequest;
 import dev.pablito.dots.exceptions.DiscogsException;
 import dev.pablito.dots.exceptions.MongoException;
+import dev.pablito.dots.exceptions.NotFoundException;
 import dev.pablito.dots.repository.ListingRepository;
 import dev.pablito.dots.repository.ProviderRepository;
+import dev.pablito.dots.repository.ReleaseRepository;
 
 @Service
 public class ListingService {
@@ -31,21 +33,24 @@ public class ListingService {
 	private DiscogsClient discogsClient;
 	@Autowired
 	private ProviderRepository providerRepository;
+	@Autowired
+	private ReleaseRepository releaseRepository;
 	private Double discogsRealBenefit = 0.85;
 
 	@Timed
 	@Transactional(rollbackFor = Exception.class)
 	public void createListing(long releaseId, String providerId, ListingRequest request)
-			throws MongoException, DiscogsException, IOException, InterruptedException {
+			throws MongoException, DiscogsException, IOException, InterruptedException, NotFoundException {
 		DatabaseListing listing = new DatabaseListing(releaseId, providerId, request.getPlatform(), request.getLink(),
 				request.getSellingPrice());
+		if (!providerRepository.existsById(providerId)) {
+			throw new NotFoundException("Problem finding the provider associated with this listing");
+		}
+		if (!releaseRepository.existsById(releaseId)) {
+			throw new NotFoundException("Problem finding the release associated with this listing");
+		}
 		if (listing.getPlatform().equals("Discogs")) {
-
 			Optional<DatabaseProvider> optProvider = providerRepository.findById(providerId);
-			if (optProvider.isEmpty()) {
-				return;
-			}
-
 			DatabaseProvider provider = optProvider.get();
 
 			double sellingPrice = listing.getSellingPrice();
@@ -72,37 +77,59 @@ public class ListingService {
 	}
 
 	@Timed
+	@Transactional(rollbackFor = Exception.class)
 	public void updateSellingPrice(long releaseId, String providerId, String listingId, Double newSellingPrice)
-			throws IOException, InterruptedException {
+			throws IOException, InterruptedException, NotFoundException, MongoException, DiscogsException {
+		if (!providerRepository.existsById(providerId)) {
+			throw new NotFoundException("Problem finding the provider associated with this listing");
+		}
+		if (!releaseRepository.existsById(releaseId)) {
+			throw new NotFoundException("Problem finding the release associated with this listing");
+		}
 		Optional<DatabaseListing> optListing = listingRepository.findByIdAndReleaseIdAndProviderId(listingId, releaseId,
 				providerId);
 
 		if (optListing.isEmpty()) {
-			return;
+			throw new NotFoundException("Problem finding this listing");
 		}
 		DatabaseListing listing = optListing.get();
-		if (listing.getPlatform().equals("Discogs") && listing.getDiscogsListingId() != null) {
-			double priceWithFees = Math.round((newSellingPrice / discogsRealBenefit) * 10.0) / 10.0;
-			String response = discogsClient.updateDiscogsListingSellingPrice(listing.getDiscogsListingId(),
-					priceWithFees);
-		}
 		listing.setSellingPrice(newSellingPrice);
 		listing.setDateLastEdition(LocalDateTime.now());
-		listingRepository.save(listing);
+		try {
+			listingRepository.save(listing);
+		} catch (Exception e) {
+			throw new MongoException("Error saving selling price of this listing in MongoDB: " + e.getMessage());
+		}
+		if (listing.getPlatform().equals("Discogs") && listing.getDiscogsListingId() != null) {
+			double priceWithFees = Math.round((newSellingPrice / discogsRealBenefit) * 10.0) / 10.0;
+			discogsClient.updateDiscogsListingSellingPrice(listing.getDiscogsListingId(), priceWithFees);
+		}
 	}
 
 	@Timed
-	public void updateLink(long releaseId, String providerId, String listingId, String newLink) {
+	@Transactional(rollbackFor = Exception.class)
+	public void updateLink(long releaseId, String providerId, String listingId, String newLink)
+			throws NotFoundException, MongoException {
+		if (!providerRepository.existsById(providerId)) {
+			throw new NotFoundException("Problem finding the provider associated with this listing");
+		}
+		if (!releaseRepository.existsById(releaseId)) {
+			throw new NotFoundException("Problem finding the release associated with this listing");
+		}
 		Optional<DatabaseListing> optListing = listingRepository.findByIdAndReleaseIdAndProviderId(listingId, releaseId,
 				providerId);
 
 		if (optListing.isEmpty()) {
-			return;
+			throw new NotFoundException("Problem finding this listing");
 		}
 		DatabaseListing listing = optListing.get();
 		listing.setLink(newLink);
 		listing.setDateLastEdition(LocalDateTime.now());
-		listingRepository.save(listing);
+		try {
+			listingRepository.save(listing);
+		} catch (Exception e) {
+			throw new MongoException("Error saving link of this listing in MongoDB: " + e.getMessage());
+		}
 	}
 
 	@Timed
@@ -112,21 +139,48 @@ public class ListingService {
 	}
 
 	@Timed
-	public void deleteListing(long releaseId, String providerId, String listingId)
-			throws IOException, InterruptedException, DiscogsException {
+	public Boolean existsListing(long releaseId, String providerId, String listingId)
+			throws IOException, InterruptedException, NotFoundException {
+		if (!providerRepository.existsById(providerId)) {
+			throw new NotFoundException("Problem finding the provider associated with this listing");
+		}
+		if (!releaseRepository.existsById(releaseId)) {
+			throw new NotFoundException("Problem finding the release associated with this listing");
+		}
+		Optional<DatabaseListing> optListing = listingRepository.findByIdAndReleaseIdAndProviderId(listingId, releaseId,
+				providerId);
 
+		return optListing.isPresent();
+	}
+
+	@Timed
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteListing(long releaseId, String providerId, String listingId)
+			throws IOException, InterruptedException, DiscogsException, NotFoundException, MongoException {
+
+		if (!providerRepository.existsById(providerId)) {
+			throw new NotFoundException("Problem finding the provider associated with this listing");
+		}
+		if (!releaseRepository.existsById(releaseId)) {
+			throw new NotFoundException("Problem finding the release associated with this listing");
+		}
 		Optional<DatabaseListing> optListing = listingRepository.findByIdAndReleaseIdAndProviderId(listingId, releaseId,
 				providerId);
 
 		if (optListing.isEmpty()) {
-			return;
+			throw new NotFoundException("Problem finding this listing");
+		}
+		DatabaseListing listing = optListing.get();
+
+		try {
+			listingRepository.delete(listing);
+		} catch (Exception e) {
+			throw new MongoException("Error deleting listing in MongoDB: " + e.getMessage());
 		}
 
-		DatabaseListing listing = optListing.get();
 		if ("Discogs".equals(listing.getPlatform()) && listing.getDiscogsListingId() != null) {
 			discogsClient.deleteDiscogsListing(listing.getDiscogsListingId());
 		}
-		listingRepository.delete(listing);
 	}
 
 }

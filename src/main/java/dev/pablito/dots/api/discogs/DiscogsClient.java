@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -109,7 +110,7 @@ public class DiscogsClient {
 		}
 	}
 
-	public DiscogsRelease getRelease(Long id) throws IOException, InterruptedException {
+	public DiscogsRelease getRelease(Long id) throws IOException, InterruptedException, DiscogsException {
 		// Cliente HTTP
 		HttpClient client = HttpClient.newHttpClient();
 		// Peticion HTTP
@@ -126,9 +127,18 @@ public class DiscogsClient {
 			return mapper.readValue(response.body(), new TypeReference<DiscogsRelease>() {
 			});
 		} else {
-			System.out.println("[ERROR " + response.statusCode() + "]: Trying to get release " + id);
+			System.out.println("[ERROR " + response.statusCode() + "]: No se pudo obtener la release.");
 			System.out.println(response.body());
-			return null;
+			String message = "Unknown Discogs error";
+			try {
+				ObjectMapper errorMapper = new ObjectMapper();
+				JsonNode node = errorMapper.readTree(response.body());
+				message = node.path("message").asText(message);
+			} catch (Exception e) {
+				// si el body no es JSON válido usamos el body directamente
+				message = response.body();
+			}
+			throw new DiscogsException("Error obtaining release in Discogs: " + message);
 		}
 	}
 
@@ -189,13 +199,6 @@ public class DiscogsClient {
 
 	public String createListing(long releaseId, double price, String discCondition, String sleeveCondition,
 			String comments) throws IOException, InterruptedException, DiscogsException {
-		if (releaseId <= 0) {
-			throw new IllegalArgumentException("El release_id es obligatorio y debe ser mayor a 0.");
-		}
-		if (price <= 0) {
-			throw new IllegalArgumentException("El precio (price) debe ser mayor a 0.");
-		}
-
 		// Crear el cuerpo de la solicitud como JSON
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectNode payload = mapper.createObjectNode();
@@ -218,11 +221,21 @@ public class DiscogsClient {
 		} else {
 			System.out.println("[ERROR " + response.statusCode() + "]: No se pudo crear el listado.");
 			System.out.println(response.body());
-			throw new DiscogsException(response.body());
+			String message = "Unknown Discogs error";
+			try {
+				ObjectMapper errorMapper = new ObjectMapper();
+				JsonNode node = errorMapper.readTree(response.body());
+				message = node.path("message").asText(message);
+			} catch (Exception e) {
+				// si el body no es JSON válido usamos el body directamente
+				message = response.body();
+			}
+			throw new DiscogsException("Error creating listing in Discogs: " + message);
 		}
 	}
 
-	public DiscogsOrder updateOrderStatus(String id, String newStatus) throws IOException, InterruptedException {
+	public DiscogsOrder updateOrderStatus(String id, String newStatus)
+			throws IOException, InterruptedException, DiscogsException {
 		HttpClient client = HttpClient.newHttpClient();
 
 		String jsonPayload = String.format("{\"status\": \"%s\"}", newStatus);
@@ -242,11 +255,21 @@ public class DiscogsClient {
 		} else {
 			System.out.println("[ERROR " + response.statusCode() + "]: Trying to update order " + id);
 			System.out.println(response.body());
-			return null;
+			String message = "Unknown Discogs error";
+
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				JsonNode node = mapper.readTree(response.body());
+				message = node.path("message").asText(message);
+			} catch (Exception e) {
+				message = response.body();
+			}
+			throw new DiscogsException("Error updating order in Discogs: " + message);
 		}
 	}
 
-	public String updateDiscogsListingSellingPrice(Long id, Double newPrice) throws IOException, InterruptedException {
+	public void updateDiscogsListingSellingPrice(Long id, Double newPrice)
+			throws IOException, InterruptedException, DiscogsException {
 		HttpClient client = HttpClient.newHttpClient();
 
 		String jsonPayload = String.format("{\"price\": \"%s\"}", newPrice);
@@ -255,17 +278,19 @@ public class DiscogsClient {
 				.uri(URI.create(DISCOGS_API_URL + "/marketplace/listings/" + id)).build();
 
 		HttpResponse<String> response = requestHandler(client, request);
-
-		if (response.statusCode() == 200) {
-			ObjectMapper mapper = new ObjectMapper();
-			// Configuramos para que los campos que no aparecen en Order se ignoren
-			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			// Lee los valores y los guarda en la variable "order"
-			return response.body();
-		} else {
+		if (response.statusCode() != 204) {
 			System.out.println("[ERROR " + response.statusCode() + "]: Trying to update listing " + id);
 			System.out.println(response.body());
-			return null;
+			String message = "Unknown Discogs error";
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				JsonNode node = mapper.readTree(response.body());
+				message = node.path("message").asText(message);
+			} catch (Exception e) {
+				// si el body no es JSON válido usamos el body directamente
+				message = response.body();
+			}
+			throw new DiscogsException("Error updating price of listing in Discogs: " + message);
 		}
 	}
 
@@ -289,13 +314,11 @@ public class DiscogsClient {
 		} else {
 			System.out.println("[ERROR " + response.statusCode() + "]: Trying to send message to " + id);
 			System.out.println(response.body());
+
 		}
 	}
 
 	public void deleteDiscogsListing(Long id) throws IOException, InterruptedException, DiscogsException {
-		if (id == null || id <= 0) {
-			throw new IllegalArgumentException("El listing_id es obligatorio y debe ser mayor a 0.");
-		}
 
 		HttpClient client = HttpClient.newHttpClient();
 
@@ -304,10 +327,21 @@ public class DiscogsClient {
 
 		HttpResponse<String> response = requestHandler(client, request);
 
-		if (response.statusCode() != 204) { // 204 No Content = borrado correcto
+		if (response.statusCode() != 204 && response.statusCode() != 404) { // 204 No Content = borrado correcto y 404
+																			// previamente borrado
 			System.out.println("[ERROR " + response.statusCode() + "]: Trying to delete listing " + id);
 			System.out.println(response.body());
-			throw new DiscogsException(response.body());
+
+			String message = "Unknown Discogs error";
+
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				JsonNode node = mapper.readTree(response.body());
+				message = node.path("message").asText(message);
+			} catch (Exception e) {
+				message = response.body();
+			}
+			throw new DiscogsException("Error deleting Listing in Discogs: " + message);
 		}
 	}
 

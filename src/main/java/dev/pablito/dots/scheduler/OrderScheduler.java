@@ -20,7 +20,7 @@ public class OrderScheduler {
 	private static final Logger logger = LoggerFactory.getLogger(OrderScheduler.class);
 
 	@Timed
-	@Scheduled(fixedRate = 60000)
+	@Scheduled(fixedRate = 600000)
 	public void checkOrdersInDiscogs() {
 		try {
 			orderService.checkOrdersInDiscogs();
