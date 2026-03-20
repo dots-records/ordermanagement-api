@@ -200,14 +200,6 @@ public class OrderService {
 	}
 
 	@Timed
-	public Optional<DatabaseOrder> updateOrderPaymentId(String id, String paymentId) {
-		return orderRepository.findById(id).map(order -> {
-			order.setPaymentId(paymentId);
-			return orderRepository.save(order);
-		});
-	}
-
-	@Timed
 	public void updateUpdatableDiscogsOrders() throws Exception {
 		List<DatabaseOrder> orders = new ArrayList<>();
 		orders.addAll(orderRepository.findByStatusAndArchivedAndPlatform("Other", false, "Discogs"));
@@ -286,7 +278,7 @@ public class OrderService {
 
 	// From Discogs
 	@Timed
-	public DiscogsOrder getOrderFromDiscogs(String id) throws IOException, InterruptedException {
+	public DiscogsOrder getOrderFromDiscogs(String id) throws IOException, InterruptedException, DiscogsException {
 		DiscogsOrder order = discogsClient.getDiscogsOrder(id);
 		if (order != null) {
 			// Add extra information of the order here
@@ -304,7 +296,7 @@ public class OrderService {
 
 	// CREATE
 
-	public void checkUpdateOrder(DatabaseOrder orderDb) throws IOException, InterruptedException {
+	public void checkUpdateOrder(DatabaseOrder orderDb) throws IOException, InterruptedException, DiscogsException {
 		DiscogsOrder orderDisc = getOrderFromDiscogs(orderDb.getId());
 		if (!orderDisc.getStatus().equals(orderDb.getStatus())) {
 			orderRepository.delete(orderDb);
@@ -313,7 +305,7 @@ public class OrderService {
 		}
 	}
 
-	public void checkUpdatesPendingOrders() throws IOException, InterruptedException {
+	public void checkUpdatesPendingOrders() throws IOException, InterruptedException, DiscogsException {
 		List<DatabaseOrder> orders = orderRepository.findByStatus("Payment Pending");
 		for (DatabaseOrder order : orders) {
 			checkUpdateOrder(order);

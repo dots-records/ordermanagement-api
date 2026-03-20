@@ -31,8 +31,7 @@ public class PaymentController {
 
 	@Timed
 	@GetMapping("/payments/{id}")
-	public ResponseEntity<?> getPayment(@PathVariable String id)
-			throws IOException, InterruptedException {
+	public ResponseEntity<?> getPayment(@PathVariable String id) throws IOException, InterruptedException {
 		try {
 			DatabasePayment response = paymentService.getPayment(id);
 			return new ResponseEntity<DatabasePayment>(response, HttpStatus.OK);
@@ -44,21 +43,20 @@ public class PaymentController {
 
 	@Timed
 	@PostMapping("/orders/{orderId}/payments")
-	public ResponseEntity<?> createPayment(@PathVariable String orderId, @RequestBody PaymentRequest request)
-			throws IOException, InterruptedException {
+	public ResponseEntity<?> createPaymentAssociatedToOrder(@RequestBody PaymentRequest request,
+			@PathVariable String orderId) {
 		try {
-			// Supongamos que createPayment devuelve el ID del payment creado
-			String paymentId = paymentService.createPayment(orderId, request);
-			return ResponseEntity.ok(paymentId); // devolvemos 200 OK con el ID
+			paymentService.createPayment(orderId, request);
+			return ResponseEntity.ok().build();
 		} catch (Exception e) {
-			logger.error("[TASK ERROR] createPayment({} {})", orderId, request, e);
+			logger.error("[TASK ERROR] createPaymentAssociatedToOrder({} {})", request, orderId, e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
 	@Timed
 	@PostMapping("/payments")
-	public ResponseEntity<?> createPayment(@RequestBody PaymentRequest request) throws IOException, InterruptedException {
+	public ResponseEntity<?> createPayment(@RequestBody PaymentRequest request, @PathVariable String orderId) {
 		try {
 			paymentService.createPayment(request);
 			return ResponseEntity.ok().build();

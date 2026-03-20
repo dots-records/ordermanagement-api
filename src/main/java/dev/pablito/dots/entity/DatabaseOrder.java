@@ -16,7 +16,6 @@ public class DatabaseOrder {
 	private String created;
 	private String createdComplete;
 	private boolean archived;
-	private String paymentId;
 	private boolean justAdded;
 	private String uri;
 	private String warning;
@@ -328,14 +327,6 @@ public class DatabaseOrder {
 
 	public void setArchived(boolean archived) {
 		this.archived = archived;
-	}
-
-	public String getPaymentId() {
-		return paymentId;
-	}
-
-	public void setPaymentId(String paymentId) {
-		this.paymentId = paymentId;
 	}
 
 	public String getId() {

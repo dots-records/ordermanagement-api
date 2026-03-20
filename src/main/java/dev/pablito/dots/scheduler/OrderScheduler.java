@@ -30,7 +30,7 @@ public class OrderScheduler {
 	}
 
 	@Timed
-	// @Scheduled(fixedRate = 360000)
+	@Scheduled(fixedRate = 650000)
 	public void updateUpdatableDiscogsOrders() {
 		try {
 			orderService.updateUpdatableDiscogsOrders();

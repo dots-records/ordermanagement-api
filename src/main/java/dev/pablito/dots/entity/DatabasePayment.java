@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class DatabasePayment {
 	@Id
 	private String id;
-	private String orderId;
 	private Double cost;
 	private Double payout;
 	private String creationDate;
@@ -17,27 +16,17 @@ public class DatabasePayment {
 		super();
 	}
 
-	public DatabasePayment(Double cost, Double payout, String creationDate, String reason) {
-		super();
-		this.cost = cost;
-		this.payout = payout;
-		this.creationDate = creationDate;
-		this.reason = reason;
-	}
-
-	public DatabasePayment(String orderId, Double cost, Double payout, String creationDate, String reason) {
-		super();
-		this.orderId = orderId;
-		this.cost = cost;
-		this.payout = payout;
-		this.creationDate = creationDate;
-		this.reason = reason;
-	}
-
-	public DatabasePayment(String id, String orderId, Double cost, Double payout, String creationDate, String reason) {
+	public DatabasePayment(String id, Double cost, Double payout, String creationDate, String reason) {
 		super();
 		this.id = id;
-		this.orderId = orderId;
+		this.cost = cost;
+		this.payout = payout;
+		this.creationDate = creationDate;
+		this.reason = reason;
+	}
+
+	public DatabasePayment(Double cost, Double payout, String creationDate, String reason) {
+		super();
 		this.cost = cost;
 		this.payout = payout;
 		this.creationDate = creationDate;
@@ -50,14 +39,6 @@ public class DatabasePayment {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
 	}
 
 	public Double getCost() {

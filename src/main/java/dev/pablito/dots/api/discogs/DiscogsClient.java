@@ -47,7 +47,7 @@ public class DiscogsClient {
 
 	// Function: Get orders from Discogs
 
-	public DiscogsOrder getDiscogsOrder(String id) throws IOException, InterruptedException {
+	public DiscogsOrder getDiscogsOrder(String id) throws IOException, InterruptedException, DiscogsException {
 		// Cliente HTTP
 		HttpClient client = HttpClient.newHttpClient();
 		// Peticion HTTP
@@ -66,7 +66,16 @@ public class DiscogsClient {
 		} else {
 			System.out.println("[ERROR " + response.statusCode() + "]: Trying to get order " + id);
 			System.out.println(response.body());
-			return null;
+			String message = "Unknown Discogs error";
+			try {
+				ObjectMapper errorMapper = new ObjectMapper();
+				JsonNode node = errorMapper.readTree(response.body());
+				message = node.path("message").asText(message);
+			} catch (Exception e) {
+				// si el body no es JSON válido usamos el body directamente
+				message = response.body();
+			}
+			throw new DiscogsException("Error geting order in Discogs: " + message);
 		}
 	}
 

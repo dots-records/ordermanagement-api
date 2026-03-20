@@ -101,19 +101,6 @@ public class OrderController {
 	}
 
 	@Timed
-	@PatchMapping("/orders/{id}/paymentId")
-	public ResponseEntity<?> patchOrderPaymentId(@PathVariable String id, @RequestBody Map<String, String> body) {
-		try {
-			String paymentId = body.get("paymentId");
-			orderService.updateOrderPaymentId(id, paymentId);
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			logger.error("[TASK ERROR] patchOrderStatus({}, body={})", id, body, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
-	}
-
-	@Timed
 	@PatchMapping("/orders/{id}/justAdded")
 	public ResponseEntity<?> patchOrderJustAdded(@PathVariable String id, @RequestBody Map<String, String> body) {
 		try {

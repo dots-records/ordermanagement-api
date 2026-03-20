@@ -13,6 +13,7 @@ import dev.pablito.dots.entity.DatabaseOrder;
 
 @Repository
 public interface OrderRepository extends MongoRepository<DatabaseOrder, String> {
+
 	Optional<DatabaseOrder> findOrderById(String id);
 
 	List<DatabaseOrder> findByStatus(String status);
@@ -25,28 +26,34 @@ public interface OrderRepository extends MongoRepository<DatabaseOrder, String> 
 
 	List<DatabaseOrder> findByStatusAndArchivedAndPlatform(String status, boolean archived, String platform);
 
-	@Query("{ 'archived' : ?0, " + "'$or' : [ " + "{ 'type' : { $regex: ?1, $options: 'i' } }, "
-			+ "{ 'number' : { $regex: ?1, $options: 'i' } }, " + "{ 'status' : { $regex: ?1, $options: 'i' } }, "
-			+ "{ 'created' : { $regex: ?1, $options: 'i' } }, "
-			+ "{ 'delivery_date' : { $regex: ?1, $options: 'i' } }, "
-			+ "{ 'payment.shipping' : { $regex: ?1, $options: 'i' } }, "
-			+ "{ 'payment.items' : { $regex: ?1, $options: 'i' } }, "
-			+ "{ 'provider.name' : { $regex: ?1, $options: 'i' } }, "
-			+ "{ 'provider.information' : { $regex: ?1, $options: 'i' } }, "
-			+ "{ 'items.name' : { $regex: ?1, $options: 'i' } }, "
-			+ "{ 'items.artists.name' : { $regex: ?1, $options: 'i' } } " + "] }")
+	// 🔎 SEARCH CON ARCHIVED
+	@Query("{ 'archived' : ?0, " + "'$or' : [ " + "{ 'discogsId' : { $regex: ?1, $options: 'i' } }, "
+			+ "{ 'status' : { $regex: ?1, $options: 'i' } }, " + "{ 'created' : { $regex: ?1, $options: 'i' } }, "
+			+ "{ 'information' : { $regex: ?1, $options: 'i' } }, " +
+
+			"{ 'items.release.name' : { $regex: ?1, $options: 'i' } }, "
+			+ "{ 'items.release.artists.name' : { $regex: ?1, $options: 'i' } }, " +
+
+			"{ 'items.provider.description' : { $regex: ?1, $options: 'i' } }, "
+			+ "{ 'items.provider.discCondition' : { $regex: ?1, $options: 'i' } }, "
+			+ "{ 'items.provider.sleeveCondition' : { $regex: ?1, $options: 'i' } }, " +
+
+			"{ 'items.listing.platform' : { $regex: ?1, $options: 'i' } } " + "] }")
 	Page<DatabaseOrder> findByArchivedAndSearchTerm(boolean archived, String palabra, Pageable pageable);
 
-	@Query("{ '$or' : [ " + "{ 'type' : { $regex: ?0, $options: 'i' } }, "
+	// 🔎 SEARCH GLOBAL
+	@Query("{ '$or' : [ " + "{ 'discogsId' : { $regex: ?0, $options: 'i' } }, "
 			+ "{ 'id' : { $regex: ?0, $options: 'i' } }, " + "{ 'status' : { $regex: ?0, $options: 'i' } }, "
-			+ "{ 'created' : { $regex: ?0, $options: 'i' } }, "
-			+ "{ 'delivery_date' : { $regex: ?0, $options: 'i' } }, "
-			+ "{ 'payment.shipping' : { $regex: ?0, $options: 'i' } }, "
-			+ "{ 'payment.items' : { $regex: ?0, $options: 'i' } }, "
-			+ "{ 'provider.name' : { $regex: ?0, $options: 'i' } }, "
-			+ "{ 'provider.information' : { $regex: ?0, $options: 'i' } }, "
-			+ "{ 'items.name' : { $regex: ?0, $options: 'i' } }, "
-			+ "{ 'items.artists.name' : { $regex: ?0, $options: 'i' } } " + "] }")
-	Page<DatabaseOrder> findBySearchTerm(String palabra, Pageable pageable);
+			+ "{ 'created' : { $regex: ?0, $options: 'i' } }, " + "{ 'information' : { $regex: ?0, $options: 'i' } }, "
+			+
 
+			"{ 'items.release.name' : { $regex: ?0, $options: 'i' } }, "
+			+ "{ 'items.release.artists.name' : { $regex: ?0, $options: 'i' } }, " +
+
+			"{ 'items.provider.description' : { $regex: ?0, $options: 'i' } }, "
+			+ "{ 'items.provider.discCondition' : { $regex: ?0, $options: 'i' } }, "
+			+ "{ 'items.provider.sleeveCondition' : { $regex: ?0, $options: 'i' } }, " +
+
+			"{ 'items.listing.platform' : { $regex: ?0, $options: 'i' } } " + "] }")
+	Page<DatabaseOrder> findBySearchTerm(String palabra, Pageable pageable);
 }
