@@ -241,6 +241,7 @@ public class OrderService {
 
 	// Checks if a new order has been made in Discogs and updates the database
 	@Timed
+	@Transactional(rollbackFor = Exception.class)
 	public void checkOrdersInDiscogs() throws Exception {
 		if (ordersInfoRepository.findAll().isEmpty()) {
 			OrdersInfo new_info = new OrdersInfo();
@@ -257,17 +258,20 @@ public class OrderService {
 				throw new RuntimeException("Error al convertir DiscogsOrder", e);
 			}
 		}).toList();
+
 		saveOrdersAndUpdateInfo(dbOrders);
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	protected void saveOrdersAndUpdateInfo(List<DatabaseOrder> dbOrders) {
+	public void saveOrdersAndUpdateInfo(List<DatabaseOrder> dbOrders) {
 		orderRepository.saveAll(dbOrders);
-		ordersInfoRepository.deleteAll(); // elimina el OrdersInfo antiguo
+
+		ordersInfoRepository.deleteAll();
 
 		OrdersInfo new_info = new OrdersInfo();
 		new_info.setCreatedAfter(getActualDate());
-		ordersInfoRepository.insert(new_info); // inserta el OrdersInfo nuevo
+
+		ordersInfoRepository.insert(new_info);
 	}
 
 	@Timed
@@ -289,9 +293,7 @@ public class OrderService {
 	// Other
 
 	private String getActualDate() {
-		ZoneId zoneId = ZoneId.of("America/Los_Angeles");
-		ZonedDateTime horaActual = ZonedDateTime.now(zoneId);
-		return horaActual.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		return ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 	}
 
 	// CREATE

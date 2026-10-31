@@ -1,6 +1,7 @@
 package dev.pablito.dots.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,23 @@ public class PaymentController {
 			return new ResponseEntity<DatabasePayment>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error("[TASK ERROR] getPayment({})", id, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+
+	@Timed
+	@GetMapping("/payments/{year}/{month}")
+	public ResponseEntity<?> getPaymentsByDate(@PathVariable int year, @PathVariable int month)
+			throws IOException, InterruptedException {
+		try {
+			if (month < 1 || month > 12) {
+				return ResponseEntity.badRequest().body("El mes debe estar entre 1 y 12");
+			}
+
+			List<DatabasePayment> response = paymentService.getPaymentsByMonth(year, month);
+			return new ResponseEntity<List<DatabasePayment>>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("[TASK ERROR] getPaymentsByDate({}, {})", year, month, e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}

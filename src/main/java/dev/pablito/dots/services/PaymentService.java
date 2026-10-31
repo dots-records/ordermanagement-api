@@ -3,6 +3,7 @@ package dev.pablito.dots.services;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,19 @@ public class PaymentService {
 		} catch (Exception e) {
 			throw new MongoException("Error creating payment in MongoDB: " + e.getMessage());
 		}
+	}
+
+	public List<DatabasePayment> getPaymentsByMonth(int year, int month) {
+		ZoneId zoneId = ZoneId.of("America/Los_Angeles");
+
+		ZonedDateTime startDate = ZonedDateTime.of(year, month, 1, 0, 0, 0, 0, zoneId);
+
+		ZonedDateTime endDate = startDate.plusMonths(1);
+
+		String start = startDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		String end = endDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+		return paymentRepository.findPaymentsByCreationDateBetween(start, end);
 	}
 
 }
