@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,7 +73,8 @@ public class PaymentService {
 		String start = startDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 		String end = endDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
-		return paymentRepository.findPaymentsByCreationDateBetween(start, end);
+		return paymentRepository.findPaymentsByCreationDateBetween(start, end,
+				Sort.by(Sort.Direction.DESC, "creationDate"));
 	}
 
 }
